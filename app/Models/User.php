@@ -45,13 +45,29 @@ class User extends Authenticatable
         ];
     }
 
-    public function product()
+    public function status()
     {
-        $this->hasMany(Product::class, 'user_id');
+        return $this->belongsTo(UserStatus::class, 'status_id');
     }
 
-    public function rating()
+    public function products()
     {
-        $this->hasMany(Rating::class, 'user_id');
+        return $this->hasMany(Product::class);
     }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'users_id');
+    }
+
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'users_chat', 'user_id', 'chat_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
 }
