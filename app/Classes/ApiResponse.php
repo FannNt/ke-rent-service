@@ -21,6 +21,7 @@ class ApiResponse
     public static function sendResponse($result, $message, $code = 200)
     {
         $response = [
+            'code' => $code,
             'success' => true,
             'data' => $result,
         ];
