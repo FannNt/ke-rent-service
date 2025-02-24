@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Repositories;
+namespace App\Http\Repositories\User;
 
 use App\Models\User;
 use App\Models\UsersStatus;
-use App\UserRepositoryInterface;
+use App\Interface\User\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface {
 

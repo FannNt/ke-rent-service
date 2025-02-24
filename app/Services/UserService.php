@@ -4,13 +4,10 @@ namespace App\Services;
 
 use App\Classes\ApiResponse;
 use App\Models\User;
-use App\UserRepositoryInterface;
-use Exception;
+use App\Interface\User\UserRepositoryInterface;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\JWT;
-use function PHPUnit\Framework\assertJson;
 
 class UserService implements ServiceInterface
 {
