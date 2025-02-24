@@ -17,6 +17,17 @@ class ApiResponse
         Log::info($e);
         throw new HttpResponseException(response()->json(["message"=> $message], 500));
     }
+    public static function sendErrorResponse($message, $code = 500)
+    {
+        $response = [
+            'code' => $code,
+            'success' => false,
+        ];
+        if (!empty($message)) {
+            $response['message'] = $message;
+        }
+        return response()->json($response,$code);
+    }
 
     public static function sendResponse($result, $message, $code = 200)
     {
@@ -29,5 +40,23 @@ class ApiResponse
             $response['message'] = $message;
         }
         return response()->json($response,$code);
+    }
+
+    public static function sendResponseWithToken($result,$token,$message,$code = 200)
+    {
+        $response = [
+            'code' => $code,
+            'success' => true,
+            'data' => $result,
+            'token' => $token,
+        ];
+        if (!empty($message)) {
+            $response['message'] = $message;
+        }
+
+        return response()
+            ->json($response, $code)
+            ->header('Authorization', 'Bearer ' . $token);
+
     }
 }
