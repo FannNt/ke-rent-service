@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('price');
             $table->text('description');
             $table->string('image')->nullable();
-            $table->boolean('is_available');
+            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }
