@@ -18,6 +18,11 @@ class UserService implements ServiceInterface
         $this->userRepository = $userRepository;
     }
 
+    public function index()
+    {
+        return $this->userRepository->all();
+
+    }
     public function create(array $data)
     {
         $userStatus = $this->userRepository->createStatus();

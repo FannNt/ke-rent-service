@@ -6,6 +6,7 @@ use App\Models\User;
 
 interface ServiceInterface
 {
+    public function index();
     public function create(array $data);
     public function update(User $user, array $data);
     public function delete($id);
