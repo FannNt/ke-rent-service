@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $guarded = [];
+
+    protected $hidden = [
+        'image_publicId'
+    ];
     public function user()
     {
-        $this->belongsTo(User::class);
+        $this->belongsTo(User::class, 'user_id');
     }
     public function rating()
     {

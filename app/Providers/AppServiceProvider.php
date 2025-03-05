@@ -6,6 +6,7 @@ use App\Http\Repositories\Product\ProductRepositories;
 use App\Http\Repositories\User\UserRepository;
 use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\User\UserRepositoryInterface;
+use App\Services\CloudinaryService;
 use App\Services\ProductService;
 use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
@@ -24,9 +25,11 @@ class AppServiceProvider extends ServiceProvider
         });
         //product
         $this->app->bind(ProductRepositoryInterface::class, ProductRepositories::class);
-        $this->app->bind(ProductService::class, function ($app){
-            return new ProductService($app->make(ProductRepositoryInterface::class));
-        });
+        $this->app->bind(ProductService::class);
+
+        //cloudinary
+
+        $this->app->bind( CloudinaryService::class);
     }
 
     /**

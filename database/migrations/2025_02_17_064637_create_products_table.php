@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('price');
             $table->text('description');
             $table->string('image')->nullable();
+            $table->string('image_publicId');
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
