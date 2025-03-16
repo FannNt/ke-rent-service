@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TransactionController;
 
 
 Route::post('/user/create', [UserController::class,'create']);
@@ -23,4 +24,10 @@ Route::middleware('jwt.auth')->group( function () {
     Route::patch('/product/update/{id}', [ProductController::class, 'update']);
     Route::delete('/product/delete/{id}', [ProductController::class,'delete']);
 
+    // transaction
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::post('/transactions', [TransactionController::class, 'create']);
+    Route::get('/transactions/{id}', [TransactionController::class, 'read']);
+    Route::put('/transactions/{id}', [TransactionController::class, 'update']);
+    Route::delete('/transactions/{id}', [TransactionController::class, 'delete']);
 });

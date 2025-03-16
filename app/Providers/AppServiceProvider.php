@@ -30,6 +30,15 @@ class AppServiceProvider extends ServiceProvider
         //cloudinary
 
         $this->app->bind( CloudinaryService::class);
+
+        // transaction
+        $this->app->bind(TransactionRepository::class, function () {
+            return new TransactionRepository();
+        });
+    
+        $this->app->bind(TransactionService::class, function ($app) {
+            return new TransactionService($app->make(TransactionRepository::class));
+        });
     }
 
     /**
