@@ -28,8 +28,12 @@ class UserService
     public function create(array $data)
     {
         try {
-            $image = $this->cloudinaryService->uploadProduct($data['profile_image']);
-            $data['profile_image'] = $image['url'];
+            if (isset($data['profile_image'])){
+                $image = $this->cloudinaryService->uploadProduct($data['profile_image']);
+                $data['profile_image'] = $image['url'];
+            } else{
+                $data['profile_image'] = '';
+            }
             $userStatus = $this->userRepository->createStatus();
             $data['user_status_id'] = $userStatus->id;
             $data['password'] = Hash::make($data['password']);

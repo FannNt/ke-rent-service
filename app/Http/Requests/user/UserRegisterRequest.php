@@ -29,7 +29,7 @@ class UserRegisterRequest extends FormRequest
             'email' => 'email|required|unique:users,email',
             'password' => 'string|required|min:3',
             'phone_number' => 'integer|required',
-            'profile_image' => 'required|image',
+            'profile_image' => 'image',
         ];
     }
 
