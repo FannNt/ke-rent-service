@@ -15,6 +15,7 @@ Route::middleware('jwt.auth')->group( function () {
     Route::get('/me', [UserController::class,'me']);
     Route::patch('/user/update/{user}',[UserController::class,'update']);
     Route::get('/{user}/product',[ProductController::class, 'findUserProduct']);
+    Route::post('/user/logout',[UserController::class,'logout']);
 
     //product
     Route::get('/product', [ProductController::class,'index']);

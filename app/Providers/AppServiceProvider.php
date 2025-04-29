@@ -20,9 +20,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //user
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(UserService::class, function ($app) {
-            return new UserService($app->make(UserRepositoryInterface::class));
-        });
+        $this->app->bind(UserService::class);
         //product
         $this->app->bind(ProductRepositoryInterface::class, ProductRepositories::class);
         $this->app->bind(ProductService::class);
