@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Interface\User\UserRepositoryInterface;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserService
