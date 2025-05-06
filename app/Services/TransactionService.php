@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
 use App\Classes\ApiResponse;
 use App\Interface\Transaction\TransactionRepositoryInterface;
@@ -9,23 +9,29 @@ use App\Models\User;
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
-use App\Repositories\TransactionRepository;
+use App\Http\Repositories\Transaction\TransactionRepositories;
+use App\Services\PaymentServices;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
-class TransactionService extends ServiceInterface
+
+class TransactionService implements ServiceInterface
 {
-    protected $transactionRepo;
+    protected $transactionRepository;
+    protected $PaymentServices;
 
-    public function __construct(TransactionRepository $transactionRepo)
+    public function __construct(TransactionRepositories $transactionRepo, PaymentServices $PaymentServices)
     {
-        $this->transactionRepo = $transactionRepo;
+        $this->transactionRepository = $transactionRepo;
+        $this->paymentServices = $PaymentServices;
     }
-
+    
     public function index()
     {
-        return $this->transactionRepo->all();
+        return $this->transactionRepository->all();
     }
 
-    public function createW(array $data)
+    public function create(array $data)
     {
         return $this->transactionRepository->create($data);
     }
@@ -35,18 +41,25 @@ class TransactionService extends ServiceInterface
         return $this->transactionRepository->update($id, $data);
     }
 
-    public function getAllTransactions()
+    public function findById($id)
     {
-        return $this->transactionRepository->getAll();
-    }
+        $transaction = $this->transactionRepository->findById($id);
+        $user = JWTAuth::parseToken()->authenticate()->id;
 
-    public function getTransactionById($id)
-    {
-        return $this->transactionRepository->findById($id);
+        if(!$transaction || $transaction->user_id !== $user){
+            abort(403, 'Unauthorized');
+        }
+
+        return $transaction;
     }
 
     public function delete($id)
     {
         return $this->transactionRepository->delete($id);
+    }
+
+    public function getByUserId($userId)
+    {
+        return $this->transactionRepository->getByUserId($userId);
     }
 }

@@ -16,18 +16,16 @@ class TransactionSeeder extends Seeder
     {
         DB::table('transaction')->insert([
             [
-                'payment_id' => 1,
                 'user_id' => 1,
-                'total_price' => number_format("30000", 2, ",", "."),
+                'total_price' => 30000,
                 'status' => 'pending',
-                'create_at' => Carbon::now()
+                'created_at' => Carbon::now()
             ],
             [
-                'payment_id' => 2,
                 'user_id' => 2,
-                'total_price' => number_format("50000", 2, ",", "."),
+                'total_price' => 50000,
                 'status' => 'approved',
-                'create_at' => Carbon::now()
+                'created_at' => Carbon::now()
             ]
         ]);
     }

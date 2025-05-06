@@ -3,29 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Payment;
+use App\Models\User;
 
 class Transaction extends Model
 {
-    protected $guarded = [];
+    protected $table = 'transaction';
 
-    protected $hidden = 
-    [
-        // ki di isi apaan fan?
+    public $timestamps = false;
+
+    protected $fillable = [
+        'payment_id',
+        'user_id',
+        'total_price',
+        'status',
+        'created_at'
     ];
 
     public function user()
     {
-        $this->belongsTo
-        (
-            //
-        );
+        return $this->belongsTo(User::class);
     }
 
-    public function rating()
+    public function payment()
     {
-        return $this->hasMany
-        (
-            //
-        );
+        return $this->hasOne(Payment::class);
     }
 }

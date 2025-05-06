@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Classes\ApiResponse;
-use App\Http\Requests\Product\TransactionCreateRequest;
-use App\Http\Requests\Product\TransactionUpdateRequest;
+use App\Http\Requests\Transaction\TransactionCreateRequest;
+use App\Http\Requests\Transaction\TransactionUpdateRequest;
 use App\Models\User;
 use App\Services\TransactionService;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +15,7 @@ use Illuminate\Validation\UnauthorizedException;
 
 class TransactionController extends Controller
 {
-    protected $transactionService;
+    private $transactionService;
 
     public function __construct(TransactionService $transactionService)
     {
@@ -24,23 +24,42 @@ class TransactionController extends Controller
 
     public function index(): JsonResponse
     {
-        $transaction = $this->transactionService->getAllTransactions();
+        $transaction = $this->transactionService->index();
         return response()->json($transaction);
     }
 
-    public function create(TransactionCreateRequest $request): JsonResponse
+    public function create(TransactionCreateRequest $request)
     {
-        $transaction = $this->transactionService->create($request->validated());
-        return response()->json($transaction, 201);
+        $data = $request->validated();
+        $result = $this->transactionService->create($data);
+
+        $transaction = $result['transaction'];
+        $payment = $result['payment'];
+
+        $response = [
+            "message" => 'transaction created successfuly',
+            "data" => [
+                'transaction_id' => $transaction->id,
+                'user_id' => $transaction->user_id,
+                'total_price' => $transaction->total_price,
+                'status' => $transaction->status,
+                'payment' => [
+                    'methods' => $payment->methods,
+                    'status' => $payment->status
+                ]
+            ]
+        ];
+
+        return response()->json($response, 201);
     }
 
-    public function read($id): JsonResponse
+    public function findById($id): JsonResponse
     {
-        $transaction = $this->transactionService->getTransactionById($id);
+        $transaction = $this->transactionService->findById($id);
         return response()->json($transaction);
     }
 
-    public function update(TransactionUpdateRequset $request,$id): JsonResponse
+    public function update(TransactionUpdateRequest $request,$id): JsonResponse
     {
         $transaction = $this->transactionService->update($id, $request->validated());
         return response()->json($transaction);
@@ -49,12 +68,19 @@ class TransactionController extends Controller
     public function delete($id): JsonResponse
     {
         $this->transactionService->delete($id);
-        return response()->json(['massage' => 'transaction deleted successfuly']);
+        return response()->json(['message' => 'transaction deleted successfuly']);
     }
 
-    public function findById($id)
+    public function getByUserId($userId)
     {
-        $transaction = $this->transactionService->findById($id);
-        return ApiResponse::sendResponse($transaction, '');
+        $transactions = $this->transactionService->getByUserId($userId);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'user_id' => $userId,
+                'transactions' => $transactions
+            ]
+        ]);
     }
 }

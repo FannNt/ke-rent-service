@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Http\Repositories\Transaction\TransactionRepositories;
 use App\Http\Repositories\Product\ProductRepositories;
 use App\Http\Repositories\User\UserRepository;
 use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\User\UserRepositoryInterface;
 use App\Services\CloudinaryService;
+use App\Interface\Transaction\TransactionRepositoryInterface;
 use App\Services\ProductService;
 use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
@@ -30,11 +32,9 @@ class AppServiceProvider extends ServiceProvider
         //cloudinary
 
         $this->app->bind( CloudinaryService::class);
-
+        
         // transaction
-        $this->app->bind(TransactionRepository::class, function () {
-            return new TransactionRepository();
-        });
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
     
         $this->app->bind(TransactionService::class, function ($app) {
             return new TransactionService($app->make(TransactionRepository::class));

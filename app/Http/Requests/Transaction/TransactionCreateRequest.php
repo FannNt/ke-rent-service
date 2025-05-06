@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Requests\Transaction;
 
 use App\Classes\ApiResponse;
@@ -18,27 +17,13 @@ class TransactionCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_id' => 'required|exists:payment,id',
-            'user_id' => 'required|exists:user,id',
-            'total_price' => 'required|integer|min:1',
-            'status' => 'required|in:pending,approved,rejected,completed',
-            'create_at' => 'required|date'
+            // 'payment_id'  => 'required|exists:payment,id',
+            'user_id'     => 'required|exists:users,id',
+            'total_price' => 'required|integer',
+            'status'      => 'required|in:pending,approved,rejected,completed',
+            'created_at'   => 'required|date',
+            'payment.methods' => 'required|in:COD,Transfer,Other',
+            'payment.status' => 'required|in:paid,not paid'
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            ApiResponse::sendResponse($validator->errors(), 400)
-        );
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            // ki di sambung ng ndi fan aku rapaham, hehe
-            'payment_id' => auth()->id(), 
-            'user_id' => auth()->id()
-        ]);
     }
 }

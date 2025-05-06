@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('transaction', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_id');
             $table->foreignId('user_id');
             $table->integer('total_price');
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
-            $table->timestamp('create_at');
+            $table->timestamp('created_at');
         });
     }
 

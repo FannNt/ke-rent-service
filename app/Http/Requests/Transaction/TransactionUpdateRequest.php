@@ -19,7 +19,7 @@ class TransactionUpdateRequest extends FormRequest
         // ]);
 
         return [
-            'status' => 'sometimes|in:pending,approved,rejected,completed'
+            'status'      => 'in:pending,approved,rejected,completed',
         ];
     }
 }
