@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Interface\Product;
+namespace App\Interface\Transaction;
 
 use App\Models\User;
+use App\Models\Product;
 
-interface ProductRepositoryInterface
+interface TransactionRepositoryInterface
 {
     public function all();
 
@@ -16,5 +17,5 @@ interface ProductRepositoryInterface
 
     public function findById($id);
 
-    public function findUserProduct(User $user);
+    public function getByUserId($userId);
 }
