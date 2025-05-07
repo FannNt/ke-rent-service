@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -17,6 +18,7 @@ Route::middleware('jwt.auth')->group( function () {
     Route::get('/me', [UserController::class,'me']);
     Route::patch('/user/update/{user}',[UserController::class,'update']);
     Route::get('/{user}/product',[ProductController::class, 'findUserProduct']);
+    Route::post('/user/logout',[UserController::class,'logout']);
 
     //product
     Route::get('/product', [ProductController::class,'index']);
@@ -37,4 +39,10 @@ Route::middleware('jwt.auth')->group( function () {
     Route::post('/payment', [PaymentController::class, 'create']);
     Route::put('/payment/{id}', [PaymentController::class, 'update']);
     Route::get('/payment/{id}', [PaymentController::class, 'findById']);
+
+    //chat
+    Route::post('/chat', [ChatController::class, 'create']);
+    Route::post('/chat/{chat}/messages', [ChatController::class,'sendMessage']);
+    Route::get('/chat/{chat}/messages', [ChatController::class, 'getMessages']);
+
 });

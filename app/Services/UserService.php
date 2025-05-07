@@ -12,10 +12,12 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UserService
 {
     protected $userRepository;
+    protected $cloudinaryService;
 
-    public function __construct(UserRepositoryInterface $userRepository)
+    public function __construct(UserRepositoryInterface $userRepository, CloudinaryService $cloudinaryService)
     {
         $this->userRepository = $userRepository;
+        $this->cloudinaryService = $cloudinaryService;
     }
 
     public function index()
@@ -25,11 +27,22 @@ class UserService
     }
     public function create(array $data)
     {
-        $userStatus = $this->userRepository->createStatus();
-        $data['user_status_id'] = $userStatus->id;
-        $data['password'] = Hash::make($data['password']);
-
-        return $this->userRepository->create($data);
+        try {
+            if (isset($data['profile_image'])){
+                $image = $this->cloudinaryService->uploadProduct($data['profile_image']);
+                $data['profile_image'] = $image['url'];
+            } else{
+                $data['profile_image'] = '';
+            }
+            $userStatus = $this->userRepository->createStatus();
+            $data['user_status_id'] = $userStatus->id;
+            $data['password'] = Hash::make($data['password']);
+            $user = $this->userRepository->create($data);
+            $token = JWTAuth::fromUser($user);
+            return ApiResponse::sendResponseWithToken($user,$token,'',201);
+        }catch (e){
+            return ApiResponse::sendErrorResponse('failed create account');
+        }
     }
 
     public function update(User $user, array $data)
@@ -48,9 +61,15 @@ class UserService
 
     }
 
-    public function delete($id)
+    public function delete(\Illuminate\Http\Request $request)
     {
-
+        try {
+            $token =  $request->bearerToken();
+            JWTAuth::invalidate($token);
+            return true;
+        }catch (e){
+            return false;
+        }
     }
 
     public function findById($id)

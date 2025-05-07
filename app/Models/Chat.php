@@ -8,7 +8,7 @@ class Chat extends Model
 {
     public function users()
     {
-        return $this->belongsToMany(User::class, 'users_chat', 'chat_id', 'user_id');
+        return $this->belongsToMany(User::class, 'users_chats', 'chat_id', 'user_id');
     }
 
     public function messages()

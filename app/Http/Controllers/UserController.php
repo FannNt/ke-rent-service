@@ -20,9 +20,11 @@ class UserController extends Controller
 
     public function create(UserRegisterRequest $request)
     {
-
         $data = $this->userService->create($request->validated());
-        return ApiResponse::sendResponse($data,'User Created',201);
+        if (!$data){
+            return ApiResponse::sendErrorResponse('failed to create account');
+        }
+        return $data;
     }
 
     public function login(UserLoginRequest $request)
@@ -46,5 +48,14 @@ class UserController extends Controller
         $data = $this->userService->update($user,$request->validated());
 
         return ApiResponse::sendResponse($data['user'],$data['status']);
+    }
+    public function logout(\Illuminate\Http\Request $request)
+    {
+        $return = $this->userService->delete($request);
+        if ($return){
+            return ApiResponse::sendResponse('success','');
+        } else {
+            return ApiResponse::sendErrorResponse('failed to logout try again later',);
+        }
     }
 }
