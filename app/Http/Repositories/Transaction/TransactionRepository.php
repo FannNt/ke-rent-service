@@ -7,7 +7,7 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 
-class TransactionRepositories implements TransactionRepositoryInterface
+class TransactionRepository implements TransactionRepositoryInterface
 {
     protected $model;
 
@@ -76,4 +76,4 @@ class TransactionRepositories implements TransactionRepositoryInterface
             ->where('user_id', $userId)
             ->get();
     }
-} 
+}

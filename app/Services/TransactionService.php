@@ -9,7 +9,7 @@ use App\Models\User;
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
-use App\Http\Repositories\Transaction\TransactionRepositories;
+use App\Http\Repositories\Transaction\TransactionRepository;
 use App\Services\PaymentServices;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
@@ -18,14 +18,14 @@ use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 class TransactionService implements ServiceInterface
 {
     protected $transactionRepository;
-    protected $PaymentServices;
+    protected $paymentServices;
 
-    public function __construct(TransactionRepositories $transactionRepo, PaymentServices $PaymentServices)
+    public function __construct(TransactionRepository $transactionRepo, PaymentServices $paymentServices)
     {
         $this->transactionRepository = $transactionRepo;
-        $this->paymentServices = $PaymentServices;
+        $this->paymentServices = $paymentServices;
     }
-    
+
     public function index()
     {
         return $this->transactionRepository->all();
