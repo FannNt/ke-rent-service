@@ -42,6 +42,7 @@ Route::middleware('jwt.auth')->group( function () {
 
     //chat
     Route::post('/chat', [ChatController::class, 'create']);
+    Route::get('/chat', [ChatController::class, 'show']);
     Route::post('/chat/{chat}/messages', [ChatController::class,'sendMessage']);
     Route::get('/chat/{chat}/messages', [ChatController::class, 'getMessages']);
 

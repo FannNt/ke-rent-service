@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponse;
 use App\Http\Requests\Chat\CreateChatRequest;
 use App\Http\Requests\Message\SendMessageRequest;
+use App\Models\User;
 use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,11 @@ class ChatController extends Controller
         $this->chatService = $chatService;
     }
 
+    public function show()
+    {
+        $room = $this->chatService->show();
+        return ApiResponse::sendResponse($room,'');
+    }
     public function create(CreateChatRequest $request)
     {
         $chat = $this->chatService->createChat($request->validated());

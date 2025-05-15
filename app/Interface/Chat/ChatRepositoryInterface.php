@@ -3,6 +3,7 @@
 namespace App\Interface\Chat;
 
 use App\Models\Chat;
+use App\Models\User;
 
 interface ChatRepositoryInterface
 {
@@ -13,4 +14,6 @@ interface ChatRepositoryInterface
     public function findById(int $chatId);
 
     public function checkUserChat($chatId);
+
+    public function findRoom();
 }
