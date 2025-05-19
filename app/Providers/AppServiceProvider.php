@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Repositories\Transaction\TransactionRepositories;
+use App\Http\Repositories\Transaction\TransactionRepository;
 use App\Http\Repositories\Chat\ChatRepository;
 use App\Http\Repositories\Message\MessageRepository;
 
@@ -16,6 +16,8 @@ use App\Services\ChatService;
 use App\Services\CloudinaryService;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 use App\Services\ProductService;
+use App\Services\TextractService;
+use App\Services\TransactionService;
 use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,13 +43,13 @@ class AppServiceProvider extends ServiceProvider
 
         //cloudinary
         $this->app->bind( CloudinaryService::class);
-        
+
         // transaction
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
-    
-        $this->app->bind(TransactionService::class, function ($app) {
-            return new TransactionService($app->make(TransactionRepository::class));
-        });
+
+        $this->app->bind(TransactionService::class);
+
+        $this->app->bind(TextractService::class);
     }
 
     /**

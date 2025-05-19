@@ -13,5 +13,11 @@ interface UserRepositoryInterface
     public function findById($id);
     public function findByEmail($email);
 
+    public function findByNumber($number);
+
     public function createStatus();
+
+    public function createKtp($data,$imageKtp);
+
+    public function findNik($nik);
 }

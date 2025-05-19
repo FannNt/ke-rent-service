@@ -7,14 +7,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PaymentController; 
+use App\Http\Controllers\PaymentController;
 
 Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
+Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
 
 Route::middleware('jwt.auth')->group( function () {
     //users
+    Route::post('/user/upload', [UserController::class, 'uploadKtp']);
     Route::get('/me', [UserController::class,'me']);
     Route::patch('/user/update/{user}',[UserController::class,'update']);
     Route::get('/{user}/product',[ProductController::class, 'findUserProduct']);

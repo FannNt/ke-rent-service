@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\user;
+namespace App\Http\Requests\User;
 
 use App\Classes\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UserUpdateRequest extends FormRequest
+class UserLoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +25,8 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'string|sometimes|min:3|max:50',
+            'email' => 'email|required',
             'password' => 'string|required|min:3',
-            'new_password' => 'string|sometimes|min:3',
-            'phone_number' => 'integer|sometimes',
-            'profile_image' => 'active_url|sometimes',
         ];
     }
 
