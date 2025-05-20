@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->nullable()->constrained('transaction')->onDelete('cascade');
             $table->enum('methods', ['COD', 'Transfer', 'Other']);
-            $table->enum('status', ['paid', 'not paid']); 
-            $table->timestamps('created_at');
+            $table->enum('status', ['paid', 'not paid']);
+            $table->timestamps();
         });
     }
 
