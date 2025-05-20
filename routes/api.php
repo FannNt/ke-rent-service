@@ -18,12 +18,13 @@ Route::middleware('jwt.auth')->group( function () {
     Route::post('/user/upload', [UserController::class, 'uploadKtp']);
     Route::get('/me', [UserController::class,'me']);
     Route::patch('/user/update/{user}',[UserController::class,'update']);
-    Route::get('/{user}/product',[ProductController::class, 'findUserProduct']);
     Route::post('/user/logout',[UserController::class,'logout']);
 
     //product
     Route::get('/product', [ProductController::class,'index']);
+    Route::get('/product/me',[ProductController::class, 'findUserProduct']);
     Route::get('/product/{id}', [ProductController::class, 'findById']);
+    Route::get('/product/user/{userId}',[ProductController::class,'findProductByUserId']);
     Route::post('/product/create', [ProductController::class, 'create']);
     Route::patch('/product/update/{id}', [ProductController::class, 'update']);
     Route::delete('/product/delete/{id}', [ProductController::class,'delete']);

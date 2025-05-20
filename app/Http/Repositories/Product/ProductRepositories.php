@@ -34,8 +34,8 @@ class ProductRepositories implements ProductRepositoryInterface {
         return Product::findOrFail($id);
     }
 
-    public function findUserProduct(User $user)
+    public function findUserProduct($userId)
     {
-        return $user->products()->get();
+        return Product::where('user_id',$userId)->get();
     }
 }
