@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id');
             $table->foreignId('product_id');
-            $table->integer('price');
             $table->integer('quantity');
         });
     }

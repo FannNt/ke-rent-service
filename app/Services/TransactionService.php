@@ -33,7 +33,37 @@ class TransactionService implements ServiceInterface
 
     public function create(array $data)
     {
-        return $this->transactionRepository->create($data);
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+        $result = $this->transactionRepository->create($data);
+        $transaction = $result['transaction'];
+        $payment = $result['payment'];
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $transaction->id,
+                'gross_amount' => $transaction->total_price,
+            ]
+        ];
+
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+        return [
+            "data" => [
+                'transaction_id' => $transaction->id,
+                'user_id' => $transaction->user_id,
+                'total_price' => $transaction->total_price,
+                'status' => $transaction->status,
+                'payment' => [
+                    'methods' => $payment->methods,
+                    'status' => $payment->status
+                ]
+            ],
+            "snap_token" => $snapToken
+        ];
     }
 
     public function update($id, array $data)

@@ -28,8 +28,8 @@ class ProductCreateRequest extends FormRequest
             'name' => 'required|string|min:3|max:50',
             'price' => 'required|integer|',
             'description' => 'required|string|max:200',
-            'image' => 'required|image',
-            'user_id' => 'exists:users,id'
+            // 'image' => 'required|image',
+            'user_id' => 'exists:users,id',
         ];
     }
     protected function failedValidation(Validator $validator)
