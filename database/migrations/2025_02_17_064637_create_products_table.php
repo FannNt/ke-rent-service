@@ -16,6 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->string('name');
             $table->integer('price');
+            $table->string('category');
+            $table->string('product_condition')->nullable();
+            $table->string('note')->nullable();
+            $table->string('location')->nullable();
             $table->text('description');
             $table->string('image')->nullable();
             $table->string('image_publicId');
