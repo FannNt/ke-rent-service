@@ -54,7 +54,10 @@ class ProductService implements ServiceInterface
 
     public function delete($id)
     {
-        $product =$this->findById($id);
+        $product = Product::findOrFail($id);
+        if (!auth()->id() == $product->user_id){
+            throw new UnauthorizedException('Unauthorized');
+        }
         $product->delete($id);
         $this->cloudinaryService->deleteProduct($product->image_publicId);
         return true;
@@ -65,13 +68,17 @@ class ProductService implements ServiceInterface
         return $this->productRepository->findById($id);
     }
 
-    public function findUserProduct(User $user)
+    public function findUserProduct()
     {
-
-        $product = $user->products();
-        Log::info('User Product',[$product]);
+        $user = auth()->id();
+        $product = $this->productRepository->findUserProduct($user);
         return $product;
     }
 
 
+    public function getByUserId($userId)
+    {
+        $product = $this->productRepository->findUserProduct($userId);
+        return $product;
+    }
 }

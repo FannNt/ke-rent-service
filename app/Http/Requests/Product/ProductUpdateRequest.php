@@ -28,8 +28,12 @@ class ProductUpdateRequest extends FormRequest
         return [
             'name' => 'sometimes|string|min:3|max:50',
             'price' => 'sometimes|integer|',
+            'category' => 'sometimes|string',
             'description' => 'sometimes|string|max:200',
             'image' => 'sometimes|image',
+            'product_condition' => 'string',
+            'note' => 'string',
+            'location' => 'string'
         ];
     }
 }

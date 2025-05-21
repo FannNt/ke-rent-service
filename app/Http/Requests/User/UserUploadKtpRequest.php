@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\User;
 
 use App\Classes\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ProductCreateRequest extends FormRequest
+class UserUploadKtpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,15 +25,7 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:50',
-            'price' => 'required|integer|',
-            'category' => 'required|string',
-            'description' => 'required|string|max:200',
-            'image' => 'required|image',
-            'product_condition' => 'string',
-            'note' => 'string',
-            'location' => 'string',
-            'user_id' => 'exists:users,id'
+            'image' => 'required|image'
         ];
     }
     protected function failedValidation(Validator $validator)
@@ -41,12 +33,5 @@ class ProductCreateRequest extends FormRequest
         throw new HttpResponseException(
             ApiResponse::sendErrorResponse($validator->errors(), 400)
         );
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'user_id' => auth()->id()
-        ]);
     }
 }

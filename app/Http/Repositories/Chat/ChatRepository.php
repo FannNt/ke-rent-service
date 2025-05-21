@@ -38,4 +38,10 @@ class ChatRepository Implements ChatRepositoryInterface
             return false;
         }
     }
+
+    public function findRoom()
+    {
+        $userId = JWTAuth::parseToken()->authenticate()->id;
+        return UsersChat::where('user_id',$userId)->with(['chat.users'])->get();
+    }
 }

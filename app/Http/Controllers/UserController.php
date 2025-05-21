@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponse;
-use App\Http\Requests\user\UserLoginRequest;
-use App\Http\Requests\user\UserRegisterRequest;
-use App\Http\Requests\user\UserUpdateRequest;
+use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Requests\User\UserLoginWithNumberRequest;
+use App\Http\Requests\User\UserRegisterRequest;
+use App\Http\Requests\User\UserUpdateRequest;
+use App\Http\Requests\User\UserUploadKtpRequest;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -36,6 +39,12 @@ class UserController extends Controller
         return $data;
     }
 
+    public function loginWithNumber(UserLoginWithNumberRequest $request)
+    {
+        $data = $this->userService->loginWithNumber($request->validated());
+        return $data;
+    }
+
     public function me()
     {
         $user = $this->userService->me();
@@ -49,7 +58,7 @@ class UserController extends Controller
 
         return ApiResponse::sendResponse($data['user'],$data['status']);
     }
-    public function logout(\Illuminate\Http\Request $request)
+    public function logout(Request $request)
     {
         $return = $this->userService->delete($request);
         if ($return){
@@ -57,5 +66,13 @@ class UserController extends Controller
         } else {
             return ApiResponse::sendErrorResponse('failed to logout try again later',);
         }
+    }
+
+    public function uploadKtp(UserUploadKtpRequest $request)
+    {
+        $image = $request->file('image');
+        $result = $this->userService->uploadKtp($image);
+
+        return ApiResponse::sendResponse($result,'success scan KTP');
     }
 }

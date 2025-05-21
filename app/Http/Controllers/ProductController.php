@@ -63,4 +63,16 @@ class ProductController extends Controller
         return ApiResponse::sendResponse($product,'');
     }
 
+    public function findUserProduct()
+    {
+        $data = $this->productService->findUserProduct();
+        return ApiResponse::sendResponse($data,'');
+    }
+
+    public function findProductByUserId($userId)
+    {
+        $data = $this->productService->getByUserId($userId);
+        return ApiResponse::sendResponse($data,"Success get product from $userId");
+    }
+
 }

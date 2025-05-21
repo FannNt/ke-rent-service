@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->integer('total_price');
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
     }
 

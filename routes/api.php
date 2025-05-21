@@ -7,22 +7,24 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PaymentController; 
+use App\Http\Controllers\PaymentController;
 
 Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
+Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
 
 Route::middleware('jwt.auth')->group( function () {
     //users
+    Route::post('/user/upload', [UserController::class, 'uploadKtp']);
     Route::get('/me', [UserController::class,'me']);
     Route::patch('/user/update/{user}',[UserController::class,'update']);
-    Route::get('/{user}/product',[ProductController::class, 'findUserProduct']);
     Route::post('/user/logout',[UserController::class,'logout']);
 
     //product
     Route::get('/product', [ProductController::class,'index']);
+    Route::get('/product/me',[ProductController::class, 'findUserProduct']);
     Route::get('/product/{id}', [ProductController::class, 'findById']);
+    Route::get('/product/user/{userId}',[ProductController::class,'findProductByUserId']);
     Route::post('/product/create', [ProductController::class, 'create']);
     Route::patch('/product/update/{id}', [ProductController::class, 'update']);
     Route::delete('/product/delete/{id}', [ProductController::class,'delete']);
@@ -42,6 +44,7 @@ Route::middleware('jwt.auth')->group( function () {
 
     //chat
     Route::post('/chat', [ChatController::class, 'create']);
+    Route::get('/chat', [ChatController::class, 'show']);
     Route::post('/chat/{chat}/messages', [ChatController::class,'sendMessage']);
     Route::get('/chat/{chat}/messages', [ChatController::class, 'getMessages']);
 

@@ -3,8 +3,10 @@
 namespace App\Http\Repositories\User;
 
 use App\Models\User;
+use App\Models\UserKtp;
 use App\Models\UsersStatus;
 use App\Interface\User\UserRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class UserRepository implements UserRepositoryInterface {
 
@@ -63,5 +65,45 @@ class UserRepository implements UserRepositoryInterface {
         ]);
 
         return true;
+    }
+
+    public function createKtp($data, $imageKtp)
+    {
+        Log::info('Creating KTP record with data:', $data);
+
+        try {
+            $user = auth()->user();
+
+            return $user->ktp()->create([
+                'user_id' => auth()->id(),
+                'nik' => $data['nik'],
+                'nama' => $data['nama'],
+                'ttl' => $data['ttl'],
+                'alamat' => $data['alamat'],
+                'rt_rw' => $data['rt_rw'],
+                'kel_desa' => $data['kel_desa'],
+                'kecamatan' => $data['kecamatan'],
+                'agama' => $data['agama'],
+                'pekerjaan' => $data['pekerjaan'],
+                'warga_negara' => $data['warga_negara'],
+                'ktp_url' => $imageKtp
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to create KTP record:', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+            return false;
+        }
+    }
+
+    public function findNik($nik)
+    {
+        return UserKtp::where('nik',$nik)->exists();
+    }
+
+    public function findByNumber($number)
+    {
+        return User::where('phone_number',$number)->first();
     }
 }

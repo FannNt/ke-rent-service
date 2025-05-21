@@ -7,6 +7,7 @@ use App\Classes\ApiResponse;
 use App\Events\MessageSent;
 use App\Interface\Chat\ChatRepositoryInterface;
 use App\Interface\Message\MessageRepositoryInterface;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
@@ -21,6 +22,11 @@ class ChatService
     {
         $this->chatRepository = $chatRepository;
         $this->messageRepository = $messageRepository;
+    }
+
+    public function show()
+    {
+        return $this->chatRepository->findRoom();
     }
 
     public function createChat(array $data)
