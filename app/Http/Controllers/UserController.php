@@ -21,6 +21,12 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    public function show()
+    {
+        $users = $this->userService->index();
+
+        return ApiResponse::sendResponse($users,'Success get all users');
+    }
     public function create(UserRegisterRequest $request)
     {
         $data = $this->userService->create($request->validated());

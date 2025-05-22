@@ -3,8 +3,6 @@
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\PaymentController;
@@ -12,6 +10,9 @@ use App\Http\Controllers\PaymentController;
 Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
+Route::middleware('role:admin')->group(function () {
+    Route::get('/user', [UserController::class,'show']);
+});
 
 Route::middleware('jwt.auth')->group( function () {
     //users
