@@ -14,8 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UsersStatusSeeder::class,
-            TransactionSeeder::class,
-            PaymentSeeder::class,
+            ProductSeeder::class,
         ]);
         User::factory()->create([
             'username' => 'Test User',

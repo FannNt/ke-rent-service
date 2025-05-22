@@ -32,22 +32,13 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         $result = $this->transactionService->create($data);
-
-        $transaction = $result['transaction'];
-        $payment = $result['payment'];
+        $data = $result['data'];
+        $snapToken = $result['snap_token'];
 
         $response = [
-            "message" => 'transaction created successfuly',
-            "data" => [
-                'transaction_id' => $transaction->id,
-                'user_id' => $transaction->user_id,
-                'total_price' => $transaction->total_price,
-                'status' => $transaction->status,
-                'payment' => [
-                    'methods' => $payment->methods,
-                    'status' => $payment->status
-                ]
-            ]
+            "message" => "transaction created successfully",
+            "data" => $data,
+            "snap_token" => $snapToken
         ];
 
         return response()->json($response, 201);
