@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('username');
             $table->string('email')->unique();
             $table->string('password');
+            $table->integer('bill')->default(0);
             $table->bigInteger('phone_number')->unique();
             $table->string('profile_image');
             $table->timestamps();

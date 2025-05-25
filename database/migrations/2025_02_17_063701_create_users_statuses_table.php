@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('role', ['admin','user']);
             $table->boolean('is_banned')->default(false);
+            $table->boolean('is_premium')->default(false);
             $table->dateTime('last_seen')->nullable();
             $table->timestamps();
         });

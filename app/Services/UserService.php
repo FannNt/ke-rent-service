@@ -96,6 +96,10 @@ class UserService
                 throw new HttpResponseException(
                     ApiResponse::sendResponse('', 'Invalid credentials', 401)
                 );
+           }elseif ($user->status->is_banned) {
+               throw new HttpResponseException(
+                   ApiResponse::sendErrorResponse('User Got Banned, Contact support for more question', '403')
+               );
            }
             $token = JWTAuth::fromUser($user);
            return ApiResponse::sendResponseWithToken($user,$token, '');
@@ -164,5 +168,14 @@ class UserService
                 ApiResponse::sendErrorResponse('An error occurred while processing KTP')
             );
         }
+    }
+
+    public function addBill($userId, $productPrice)
+    {
+        $bill = 0.1 * $productPrice;
+
+        $userBill = $this->userRepository->addBill($userId,$bill);
+
+        return true;
     }
 }
