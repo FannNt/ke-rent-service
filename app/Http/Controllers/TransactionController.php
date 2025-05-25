@@ -25,7 +25,7 @@ class TransactionController extends Controller
     public function index(): JsonResponse
     {
         $transaction = $this->transactionService->index();
-        return response()->json($transaction);
+        return ApiResponse::sendResponse($transaction, '');
     }
 
     public function create(TransactionCreateRequest $request)
@@ -36,30 +36,29 @@ class TransactionController extends Controller
         $snapToken = $result['snap_token'];
 
         $response = [
-            "message" => "transaction created successfully",
             "data" => $data,
             "snap_token" => $snapToken
         ];
 
-        return response()->json($response, 201);
+        return ApiResponse::sendResponse($response,"transaction created successfully", 201);
     }
 
     public function findById($id): JsonResponse
     {
         $transaction = $this->transactionService->findById($id);
-        return response()->json($transaction);
+        return ApiResponse::sendResponse($transaction,'');
     }
 
     public function update(TransactionUpdateRequest $request,$id): JsonResponse
     {
         $transaction = $this->transactionService->update($id, $request->validated());
-        return response()->json($transaction);
+        return ApiResponse::sendResponse($transaction,'');
     }
 
     public function delete($id): JsonResponse
     {
         $this->transactionService->delete($id);
-        return response()->json(['message' => 'transaction deleted successfuly']);
+        return ApiResponse::sendResponse('','transaction deleted successfully');
     }
 
     public function getByUserId($userId)

@@ -10,11 +10,14 @@ use App\Http\Controllers\PaymentController;
 Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
-Route::middleware('role:admin')->group(function () {
-    Route::get('/user', [UserController::class,'show']);
-});
 
 Route::middleware('jwt.auth')->group( function () {
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [UserController::class,'show']);
+        Route::get('/transactions', [TransactionController::class, 'index']);
+    });
+
     //users
     Route::post('/user/upload', [UserController::class, 'uploadKtp']);
     Route::get('/me', [UserController::class,'me']);
@@ -31,7 +34,6 @@ Route::middleware('jwt.auth')->group( function () {
     Route::delete('/product/delete/{id}', [ProductController::class,'delete']);
 
     // transaction
-    Route::get('/transactions', [TransactionController::class, 'index']);
     Route::post('/transactions', [TransactionController::class, 'create']);
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
     Route::put('/transactions/{id}', [TransactionController::class, 'update']);
