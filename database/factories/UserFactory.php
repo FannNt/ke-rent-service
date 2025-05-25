@@ -28,7 +28,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'user_status_id' => 1,
             'password' => static::$password ??= Hash::make('password'),
-            'phone_number' => 102301293,
+            'phone_number' => rand(1000000000,99999999999),
             'profile_image' => 'amdsaksdak@gmail.com'
         ];
     }
