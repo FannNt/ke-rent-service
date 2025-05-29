@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\AdminController;
+use App\Http\Repositories\Terms\TermsRepository;
 use App\Http\Repositories\Transaction\TransactionRepository;
 use App\Http\Repositories\Chat\ChatRepository;
 use App\Http\Repositories\Message\MessageRepository;
@@ -12,10 +14,12 @@ use App\Interface\Chat\ChatRepositoryInterface;
 use App\Interface\Message\MessageRepositoryInterface;
 use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\User\UserRepositoryInterface;
+use App\Services\AdminService;
 use App\Services\ChatService;
 use App\Services\CloudinaryService;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 use App\Services\ProductService;
+use App\Services\TermsService;
 use App\Services\TextractService;
 use App\Services\TransactionService;
 use App\Services\UserService;
@@ -31,6 +35,15 @@ class AppServiceProvider extends ServiceProvider
         //user
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(UserService::class);
+
+        //admin
+        $this->app->bind(AdminService::class);
+        $this->app->bind(AdminController::class);
+
+        //terms
+        $this->app->bind(TermsRepository::class);
+        $this->app->bind(TermsService::class);
+
         //product
         $this->app->bind(ProductRepositoryInterface::class, ProductRepositories::class);
         $this->app->bind(ProductService::class);

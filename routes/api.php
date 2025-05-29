@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
@@ -16,6 +17,11 @@ Route::middleware('jwt.auth')->group( function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/users', [UserController::class,'show']);
         Route::get('/transactions', [TransactionController::class, 'index']);
+
+        //terms
+        Route::post('/terms/add', [AdminController::class,'addTerms']);
+        Route::patch('/terms/{id}/edit',[AdminController::class, 'editTerms']);
+        Route::delete('/terms/{id}/remove', [AdminController::class, 'removeTerms']);
     });
 
     //users
