@@ -18,6 +18,7 @@ class UsersStatusFactory extends Factory
     {
         return [
             'is_banned' => false,
+            'role' => 'user',
             'last_seen' => now()
         ];
     }

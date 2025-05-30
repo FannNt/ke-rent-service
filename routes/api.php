@@ -1,10 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\PaymentController;
@@ -14,6 +13,17 @@ Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
 
 Route::middleware('jwt.auth')->group( function () {
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [UserController::class,'show']);
+        Route::get('/transactions', [TransactionController::class, 'index']);
+
+        //terms
+        Route::post('/terms/add', [AdminController::class,'addTerms']);
+        Route::patch('/terms/{id}/edit',[AdminController::class, 'editTerms']);
+        Route::delete('/terms/{id}/remove', [AdminController::class, 'removeTerms']);
+    });
+
     //users
     Route::post('/user/upload', [UserController::class, 'uploadKtp']);
     Route::get('/me', [UserController::class,'me']);
@@ -30,7 +40,6 @@ Route::middleware('jwt.auth')->group( function () {
     Route::delete('/product/delete/{id}', [ProductController::class,'delete']);
 
     // transaction
-    Route::get('/transactions', [TransactionController::class, 'index']);
     Route::post('/transactions', [TransactionController::class, 'create']);
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
     Route::put('/transactions/{id}', [TransactionController::class, 'update']);

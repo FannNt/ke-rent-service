@@ -20,4 +20,6 @@ interface UserRepositoryInterface
     public function createKtp($data,$imageKtp);
 
     public function findNik($nik);
+
+    public function addBill($userId, $bill);
 }

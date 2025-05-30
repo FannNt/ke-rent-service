@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users_statuses', function (Blueprint $table) {
+        Schema::create('terms', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', ['admin','user']);
-            $table->boolean('is_banned')->default(false);
-            $table->boolean('is_premium')->default(false);
-            $table->dateTime('last_seen')->nullable();
+            $table->string('name')->unique();
+            $table->text('message');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_statuses');
+        Schema::dropIfExists('terms');
     }
 };

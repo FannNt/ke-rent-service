@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
 use App\Http\Repositories\Transaction\TransactionRepository;
 use App\Services\PaymentServices;
+use Midtrans\Config;
+use Midtrans\Snap;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
@@ -33,10 +35,10 @@ class TransactionService implements ServiceInterface
 
     public function create(array $data)
     {
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
-        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
 
         $result = $this->transactionRepository->create($data);
         $transaction = $result['transaction'];
@@ -49,7 +51,7 @@ class TransactionService implements ServiceInterface
             ]
         ];
 
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
+        $snapToken = Snap::getSnapToken($params);
 
         return [
             "data" => [
@@ -77,7 +79,7 @@ class TransactionService implements ServiceInterface
         $user = JWTAuth::parseToken()->authenticate()->id;
 
         if(!$transaction || $transaction->user_id !== $user){
-            abort(403, 'Unauthorized');
+            return  ApiResponse::sendErrorResponse('Unauthorized',403);
         }
 
         return $transaction;

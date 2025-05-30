@@ -106,4 +106,11 @@ class UserRepository implements UserRepositoryInterface {
     {
         return User::where('phone_number',$number)->first();
     }
+
+    public function addBill($userId, $bill)
+    {
+        return User::where('id', $userId)->update([
+            'bill' => $bill
+        ]);
+    }
 }
