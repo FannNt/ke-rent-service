@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use App\Interface\Transaction\TransactionRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
@@ -21,23 +22,27 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $this->model->all();
     }
 
-    public function create(array $data)
+    public function create(array $data,$userId)
     {
         DB::beginTransaction();
+        Log::info('data',[$data]);
 
         try{
             $transaction = Transaction::create([
-                "user_id" => $data['user_id'],
+                "product_id" => $data['product_id'],
+                "user_id" => $userId,
                 "total_price" => $data['total_price'],
-                "status" => $data['status'],
-                "created_at" => $data['created_at']
+                'rent_day' =>$data['rent_day'],
+                "rental_start" => $data['rental_start'],
+                "rental_end" => $data['rental_end']
             ]);
+            $transaction->refresh();
 
             $payment = Payment::create([
                 "transaction_id" => $transaction->id,
                 "methods" => $data['payment']['methods'] ?? 'COD',
-                "status" => $data['payment']['status'] ?? 'not paid'
             ]);
+            $payment->refresh();
 
             DB::commit();
             return [

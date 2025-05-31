@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Classes\ApiResponse;
+use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Cloudinary\Cloudinary;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
@@ -21,9 +23,11 @@ class TransactionService implements ServiceInterface
 {
     protected $transactionRepository;
     protected $paymentServices;
+    protected $productRepository;
 
-    public function __construct(TransactionRepository $transactionRepo, PaymentServices $paymentServices)
+    public function __construct(TransactionRepository $transactionRepo, PaymentServices $paymentServices, ProductRepositoryInterface $productRepository)
     {
+        $this->productRepository = $productRepository;
         $this->transactionRepository = $transactionRepo;
         $this->paymentServices = $paymentServices;
     }
@@ -40,32 +44,52 @@ class TransactionService implements ServiceInterface
         Config::$isSanitized = config('midtrans.is_sanitized');
         Config::$is3ds = config('midtrans.is_3ds');
 
-        $result = $this->transactionRepository->create($data);
+        $product = $this->productRepository->findById($data['product_id']);
+        $start = Carbon::parse($data['rental_start']);
+        $end = Carbon::parse($data['rental_end']);
+        $rentDay =  $start->diffInDays($end);
+
+        $total_price = $rentDay * $product->price;
+
+        $data['total_price'] = $total_price;
+        $data['rent_day'] = $rentDay;
+        Log::info('data', $data);
+        $result = $this->transactionRepository->create($data,auth()->id());
         $transaction = $result['transaction'];
         $payment = $result['payment'];
 
+        $transaction->setRelation('product',$product);
+        $product = $transaction->product;
         $params = [
             'transaction_details' => [
                 'order_id' => $transaction->id,
                 'gross_amount' => $transaction->total_price,
+            ],
+            'customer_details' => [
+                'fisrt_name' => auth()->user()->username,
+                'email' => auth()->user()->email
+            ],
+            'item_details' => [
+                [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'quantity' => $transaction->rent_day,
+                    'price' => $product->price
+
+                ]
             ]
         ];
 
-        $snapToken = Snap::getSnapToken($params);
-
-        return [
-            "data" => [
-                'transaction_id' => $transaction->id,
-                'user_id' => $transaction->user_id,
-                'total_price' => $transaction->total_price,
-                'status' => $transaction->status,
-                'payment' => [
-                    'methods' => $payment->methods,
-                    'status' => $payment->status
-                ]
-            ],
-            "snap_token" => $snapToken
+        $response = [
+            "transaction" => $transaction->only('id','user_id','total_price','status','product_id'),
+            "payment" => $payment->only('id','transaction_id','methods')
         ];
+        if ($payment->methods != "COD"){
+            $snapToken = Snap::getSnapToken($params);
+            $response['snap_token'] = $snapToken;
+        }
+        Log::info($transaction);
+        return $response;
     }
 
     public function update($id, array $data)

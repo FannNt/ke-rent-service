@@ -9,7 +9,7 @@ interface TransactionRepositoryInterface
 {
     public function all();
 
-    public function create(array $data);
+    public function create(array $data,$userId);
 
     public function update($id,array $data);
 

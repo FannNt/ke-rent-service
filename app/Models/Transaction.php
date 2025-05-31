@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Payment;
-use App\Models\User;
 
 class Transaction extends Model
 {
+    use HasFactory;
+
     protected $table = 'transaction';
 
-    public $timestamps = false;
 
     protected $fillable = [
-        'payment_id',
+        'product_id',
         'user_id',
         'total_price',
         'status',
-        'created_at'
+        'rent_day',
+        'rental_start',
+        'rental_end'
     ];
 
     public function user()
@@ -28,5 +30,10 @@ class Transaction extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class,'product_id');
     }
 }

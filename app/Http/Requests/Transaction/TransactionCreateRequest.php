@@ -17,13 +17,17 @@ class TransactionCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'payment_id'  => 'required|exists:payment,id',
-            'user_id'     => 'required|exists:users,id',
-            'total_price' => 'required|integer',
-            'status'      => 'required|in:pending,approved,rejected,completed',
-            'created_at'   => 'required|date',
+            'product_id'     => 'required|exists:products,id',
+            'rental_start' => 'required|date',
+            'rental_end' => 'required|date',
             'payment.methods' => 'required|in:COD,Transfer,Other',
-            'payment.status' => 'required|in:paid,not paid'
+            'payment.status' => 'sometimes|in:paid,not paid'
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::sendErrorResponse($validator->errors(), 400)
+        );
     }
 }

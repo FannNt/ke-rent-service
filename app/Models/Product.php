@@ -19,4 +19,9 @@ class Product extends Model
     {
         return $this->hasMany(Rating::class, 'product_id');
     }
+
+    public function transaction()
+    {
+        return $this->hasOne(Product::class,'product_id');
+    }
 }

@@ -32,15 +32,8 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         $result = $this->transactionService->create($data);
-        $data = $result['data'];
-        $snapToken = $result['snap_token'];
 
-        $response = [
-            "data" => $data,
-            "snap_token" => $snapToken
-        ];
-
-        return ApiResponse::sendResponse($response,"transaction created successfully", 201);
+        return ApiResponse::sendResponse($result,"transaction created successfully", 201);
     }
 
     public function findById($id): JsonResponse
