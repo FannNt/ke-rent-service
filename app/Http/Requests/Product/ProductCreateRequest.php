@@ -25,14 +25,17 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:50',
-            'price' => 'required|integer|',
-            'category' => 'required|string',
-            'description' => 'required|string|max:200',
-            'image' => 'required|image',
-            'product_condition' => 'string',
-            'note' => 'string',
-            'location' => 'string',
+            'name' => 'required|string|min:3|max:100',
+            'description' => 'required|string|min:10|max:500',
+            'price' => 'required|integer|min:10000',
+            'category' => 'required|string|in:Kamera,Elektronik,Outdoor,Kendaraan,Furnitur,Lainnya',
+            'year' => 'nullable|string|max:4',
+            'images' => 'required|array|min:1|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'address_text' => 'required|string|min:10|max:200',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'note' => 'nullable|string|max:300',
             'user_id' => 'exists:users,id'
         ];
     }

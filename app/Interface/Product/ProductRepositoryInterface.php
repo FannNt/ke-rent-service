@@ -17,4 +17,6 @@ interface ProductRepositoryInterface
     public function findById($id);
 
     public function findUserProduct($userId);
+
+    public function addProductImage($image,$productId);
 }

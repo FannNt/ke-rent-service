@@ -7,6 +7,8 @@ use App\Interface\Product\ProductRepositoryInterface;
 use App\Models\Product;
 use App\Models\User;
 use Cloudinary\Cloudinary;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
 
@@ -28,38 +30,46 @@ class ProductService implements ServiceInterface
 
     public function create(array $data)
     {
-        $image = $this->cloudinaryService->uploadProduct($data['image']);
-        $data['image'] = $image['url'];
-        $data['image_publicId'] = $image['public_id'];
-        return $this->productRepository->create($data);
+
+        $clean = Arr::except($data,['images']);
+        $product = $this->productRepository->create($clean);
+
+        foreach ($data['images'] as $image) {
+            $data = $this->cloudinaryService->uploadProduct($image);
+            $this->productRepository->addProductImage($data,$product->id);
+        }
+
+        return $product->load('image');
     }
 
     public function update($id,$data)
     {
-        $product = Product::findOrFail($id);
-        if (!auth()->id() == $product->user_id){
+        $product = $this->productRepository->findById($id);
+        if (auth()->id() != $product->user_id){
             throw new UnauthorizedException('Unauthorized');
         }
-        if (isset($data['image'])) {
-            $this->cloudinaryService->deleteProduct($product->image_publicId);
-            $image =$this->cloudinaryService->uploadProduct($data['image']);
-            $data['image'] = $image['url'];
-            $data['image_publicId'] = $image['public_id'];
-        }
 
-        $product->update($data);
+        $clear = Arr::except($data,['images']);
+
+        $product->update($clear);
 
         return $product->fresh();
     }
 
     public function delete($id)
     {
-        $product = Product::findOrFail($id);
-        if (!auth()->id() == $product->user_id){
-            throw new UnauthorizedException('Unauthorized');
+        $product = $this->productRepository->findById($id);
+        if (auth()->id() != $product->user_id){
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Unauthorized',401)
+            );
+        }
+        foreach ($product->image->pluck('image_publicId') as $image) {
+            Log::info($image);
+            $this->cloudinaryService->deleteProduct($image);
         }
         $product->delete($id);
-        $this->cloudinaryService->deleteProduct($product->image_publicId);
+        Log::info("success delete product $product->id, from user $product->user_id");
         return true;
     }
 
