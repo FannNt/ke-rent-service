@@ -27,7 +27,7 @@ class ProductResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'is_available' => $this->is_available ?? 1,
-            'url' => $this->whenLoaded('image', function (){
+            'image' => $this->whenLoaded('image', function (){
                 return $this->image->pluck('image');
             })
 
