@@ -18,6 +18,7 @@ use App\Services\AdminService;
 use App\Services\ChatService;
 use App\Services\CloudinaryService;
 use App\Interface\Transaction\TransactionRepositoryInterface;
+use App\Services\MidtransService;
 use App\Services\ProductService;
 use App\Services\TermsService;
 use App\Services\TextractService;
@@ -63,6 +64,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TransactionService::class);
 
         $this->app->bind(TextractService::class);
+
+        //midtrans
+        $this->app->bind(MidtransService::class);
     }
 
     /**

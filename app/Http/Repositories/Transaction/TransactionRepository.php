@@ -4,22 +4,18 @@ namespace App\Http\Repositories\Transaction;
 
 use App\Models\Transaction;
 use App\Models\Payment;
+use App\TransactionStatus;
 use Illuminate\Support\Facades\DB;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
-    protected $model;
 
-    public function __construct(Transaction $model)
-    {
-        $this->model = $model;
-    }
 
     public function all()
     {
-        return $this->model->all();
+        return Transaction::with(['product','payment']);
     }
 
     public function create(array $data,$userId)
@@ -56,12 +52,15 @@ class TransactionRepository implements TransactionRepositoryInterface
         }
     }
 
-    public function update($id, array $data)
+    public function updateStatus($id,TransactionStatus $status)
     {
-        $transaction = $this->model->findOrFail($id);
-        $transaction->update($data);
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update([
+            'status' => $status
+        ]);
         return $transaction;
     }
+
 
     public function findById($id)
     {
@@ -70,7 +69,7 @@ class TransactionRepository implements TransactionRepositoryInterface
 
     public function delete($id)
     {
-        $transaction = $this->model->findOrFail($id);
+        $transaction = Transaction::findOrFail($id);
         $transaction->delete();
         return true;
     }

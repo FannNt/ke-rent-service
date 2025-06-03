@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,8 @@ Route::middleware('jwt.auth')->group( function () {
     // transaction
     Route::post('/transactions', [TransactionController::class, 'create']);
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
-    Route::put('/transactions/{id}', [TransactionController::class, 'update']);
+    Route::post('/transaction/approve/{id}', [TransactionController::class, 'acceptTransaction']);
+    Route::post('/transaction/reject/{id}', [TransactionController::class, 'rejectTransaction']);
     Route::delete('/transactions/{id}', [TransactionController::class, 'delete']);
     Route::get('/user/{userId}/transactions', [TransactionController::class, 'getByUserId']);
 
@@ -57,4 +59,6 @@ Route::middleware('jwt.auth')->group( function () {
     Route::post('/chat/{chat}/messages', [ChatController::class,'sendMessage']);
     Route::get('/chat/{chat}/messages', [ChatController::class, 'getMessages']);
 
+    //notification
+    Route::get('/notifications', [NotificationController::class, 'index']);
 });

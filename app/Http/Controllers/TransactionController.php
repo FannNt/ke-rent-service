@@ -36,6 +36,19 @@ class TransactionController extends Controller
         return ApiResponse::sendResponse($result,"transaction created successfully", 201);
     }
 
+    public function acceptTransaction($id)
+    {
+        $data = $this->transactionService->acceptTransaction($id);
+        return ApiResponse::sendResponse($data,'success approve transaction');
+    }
+    public function rejectTransaction($id)
+    {
+        $data = $this->transactionService->rejectTransaction($id);
+        return ApiResponse::sendResponse($data,'success reject transaction');
+    }
+
+
+
     public function findById($id): JsonResponse
     {
         $transaction = $this->transactionService->findById($id);

@@ -20,8 +20,9 @@ class TransactionCreateRequest extends FormRequest
             'product_id'     => 'required|exists:products,id',
             'rental_start' => 'required|date',
             'rental_end' => 'required|date',
+            'pickup_hour' => 'required|integer|min:0|max:23',
+            'return_hour' => 'required|integer|min:0|max:23',
             'payment.methods' => 'required|in:COD,Transfer,Other',
-            'payment.status' => 'sometimes|in:paid,not paid'
         ];
     }
     protected function failedValidation(Validator $validator)

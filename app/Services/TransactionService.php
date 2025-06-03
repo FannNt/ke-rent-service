@@ -7,8 +7,15 @@ use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\Transaction\TransactionRepositoryInterface;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Notifications\BuyerApproveNotification;
+use App\Notifications\BuyerRejectNotification;
+use App\Notifications\BuyerWaitingNotification;
+use App\Notifications\SellerBuyedNotification;
+use App\Notifications\SellerWaitingNotification;
+use App\TransactionStatus;
 use Carbon\Carbon;
 use Cloudinary\Cloudinary;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
 use App\Http\Repositories\Transaction\TransactionRepository;
@@ -19,7 +26,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
 
-class TransactionService implements ServiceInterface
+class TransactionService
 {
     protected $transactionRepository;
     protected $paymentServices;
@@ -39,10 +46,6 @@ class TransactionService implements ServiceInterface
 
     public function create(array $data)
     {
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = config('midtrans.is_sanitized');
-        Config::$is3ds = config('midtrans.is_3ds');
 
         $product = $this->productRepository->findById($data['product_id']);
         $start = Carbon::parse($data['rental_start']);
@@ -53,48 +56,47 @@ class TransactionService implements ServiceInterface
 
         $data['total_price'] = $total_price;
         $data['rent_day'] = $rentDay;
-        Log::info('data', $data);
         $result = $this->transactionRepository->create($data,auth()->id());
         $transaction = $result['transaction'];
         $payment = $result['payment'];
-
-        $transaction->setRelation('product',$product);
-        $product = $transaction->product;
-        $params = [
-            'transaction_details' => [
-                'order_id' => $transaction->id,
-                'gross_amount' => $transaction->total_price,
-            ],
-            'customer_details' => [
-                'fisrt_name' => auth()->user()->username,
-                'email' => auth()->user()->email
-            ],
-            'item_details' => [
-                [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'quantity' => $transaction->rent_day,
-                    'price' => $product->price
-
-                ]
-            ]
-        ];
-
+        $transaction->user->notify(new BuyerWaitingNotification($transaction));
+        $transaction->product->user->notify(new SellerBuyedNotification($transaction));
         $response = [
             "transaction" => $transaction->only('id','user_id','total_price','status','product_id'),
             "payment" => $payment->only('id','transaction_id','methods')
         ];
-        if ($payment->methods != "COD"){
-            $snapToken = Snap::getSnapToken($params);
-            $response['snap_token'] = $snapToken;
-        }
+
         Log::info($transaction);
         return $response;
     }
 
-    public function update($id, array $data)
+    public function acceptTransaction($id)
     {
-        return $this->transactionRepository->update($id, $data);
+        $transaction = $this->transactionRepository->findById($id);
+        if ($transaction->product->user != auth()->id()){
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Forbidden',403)
+            );
+        }
+        $transaction->user->notify(new BuyerApproveNotification($transaction));
+        auth()->notify(new SellerWaitingNotification($transaction));
+
+        return $this->transactionRepository->updateStatus($id, TransactionStatus::APPROVED);
+    }
+
+    public function rejectTransaction($id)
+    {
+        $transaction = $this->transactionRepository->findById($id);
+        if ($transaction->product->user != auth()->id()){
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Forbidden',403)
+            );
+        }
+
+        $transaction->user->notify(new BuyerRejectNotification($transaction));
+        $this->transactionRepository->updateStatus($id, TransactionStatus::REJECTED);
+
+        return true;
     }
 
     public function findById($id)
