@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Sweet Alert CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="{{ asset('css/loginPage.css') }}">
 </head>
@@ -16,7 +18,7 @@
             @if(session('error'))
                 <div class="alert alert-danger text-center">{{ session('error') }}</div>
             @endif
-            <form method="POST" action="{{ route('admin.login') }}">
+            <form method="POST" action="{{ route('admin.login') }}" id="loginForm">
                 @csrf
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
@@ -52,7 +54,53 @@
             </form>
         </div>
     </div>
-    <!-- Bootstrap JS (opsional, jika butuh komponen interaktif) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sweet Alert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: data.type,
+                    title: data.title,
+                    text: data.text,
+                    showConfirmButton: data.type === 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (data.type === 'success' && data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Terjadi kesalahan saat memproses permintaan'
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -47,24 +47,43 @@ class AdminPanelController extends Controller
             $result = $response->getData();
 
             if (!$result->success) {
-                return 'Email atau password salah';
+                return response()->json([
+                    'type' => 'error',
+                    'title' => 'Oops...',
+                    'text' => 'Email atau password salah'
+                ])->header('Content-Type', 'application/json');
             }
 
             if ($result->data->status->role !== 'admin') {
-                return 'Akses ditolak. Hanya admin yang diizinkan';
+                return response()->json([
+                    'type' => 'error',
+                    'title' => 'Akses Ditolak',
+                    'text' => 'Hanya admin yang diizinkan'
+                ])->header('Content-Type', 'application/json');
             }
 
             // Set token in session
             session(['token' => $result->token]);
             session(['user' => (array)$result->data]);
 
-            return redirect()->route('admin.page');
+            return response()->json([
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Login berhasil',
+                'redirect' => route('admin.page')
+            ])->header('Content-Type', 'application/json');
         } catch(\Illuminate\Http\Exceptions\HttpResponseException $e){
-            $response = $e->getResponse();
-            $data = json_decode($response->getContent());
-            return 'Email atau password salah';
+            return response()->json([
+                'type' => 'error',
+                'title' => 'Oops...',
+                'text' => 'Email atau password salah'
+            ])->header('Content-Type', 'application/json');
         } catch (\Exception $e) {
-            return 'Terjadi kesalahan: ' . $e->getMessage();
+            return response()->json([
+                'type' => 'error',
+                'title' => 'Oops...',
+                'text' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ])->header('Content-Type', 'application/json');
         }
     }
 }
