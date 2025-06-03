@@ -11,9 +11,6 @@ Route::get('/', function(){
 Route::get('/admin', [AdminPanelController::class, 'index']);
 Route::post('/admin/login', [AdminPanelController::class, 'login'])->name('admin.login');
 
-
-Route::middleware('jwt.auth')->group( function () {
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/home', [AdminPanelController::class, 'showHome'])->name('admin.page');
-    });
+Route::middleware(['jwt.verify', 'role:admin'])->group(function () {
+    Route::get('/home', [AdminPanelController::class, 'showHome'])->name('admin.page');
 });

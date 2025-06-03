@@ -17,8 +17,6 @@ class AdminPanelController extends Controller
     public function __construct(UserController $UserController)
     {
         $this->UserController = $UserController;
-        $this->middleware('jwt.verify', ['except' => ['index', 'login']]);
-        $this->middleware('role:admin', ['except' => ['index', 'login']]);
     }
 
     public function index()
@@ -30,7 +28,6 @@ class AdminPanelController extends Controller
     {
         return view('adminPage');
     }
-    
     
     public function login(Request $request)
     {
@@ -61,10 +58,11 @@ class AdminPanelController extends Controller
             session(['token' => $result->token]);
             session(['user' => (array)$result->data]);
 
-            // Set token in cookie for subsequent requests
-            $cookie = cookie('token', $result->token, 60); // 60 minutes
-
-            return redirect()->route('admin.page')->withCookie($cookie);
+            return redirect()->route('admin.page');
+        } catch(\Illuminate\Http\Exceptions\HttpResponseException $e){
+            $response = $e->getResponse();
+            $data = json_decode($response->getContent());
+            return 'Email atau password salah';
         } catch (\Exception $e) {
             return 'Terjadi kesalahan: ' . $e->getMessage();
         }
