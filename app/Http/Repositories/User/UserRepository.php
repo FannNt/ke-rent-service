@@ -13,7 +13,7 @@ class UserRepository implements UserRepositoryInterface {
 
     public function all()
     {
-        return User::all();
+        return User::with('status')->get();
     }
 
     public function create(array $data)
@@ -60,7 +60,9 @@ class UserRepository implements UserRepositoryInterface {
         if (!$user){
             return null;
         }
-        UsersStatus::query()->where($id)->update([
+        
+        // Update status banned di tabel users_statuses
+        UsersStatus::where('id', $user->user_status_id)->update([
             'is_banned' => true,
         ]);
 

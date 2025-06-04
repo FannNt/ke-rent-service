@@ -13,7 +13,7 @@ Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
 
-Route::middleware('jwt.auth')->group( function () {
+Route::middleware('jwt.verify')->group( function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/users', [UserController::class,'show']);

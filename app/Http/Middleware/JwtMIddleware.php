@@ -21,14 +21,32 @@ class JwtMIddleware
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            // Cek apakah request dari API atau Web
+            if ($request->is('api/*')) {
+                // Untuk API, hanya terima token dari header
+                $user = JWTAuth::parseToken()->authenticate();
+            } else {
+                // Untuk Web, cek session dulu
+                if (session()->has('token')) {
+                    $request->headers->set('Authorization', 'Bearer ' . session('token'));
+                    $user = JWTAuth::parseToken()->authenticate();
+                } else {
+                    return redirect()->route('admin.login');
+                }
+            }
         } catch (Exception $e) {
-            if ($e instanceof TokenInvalidException){
-                return response()->json(['status' => 'Token is Invalid']);
-            }else if ($e instanceof TokenExpiredException){
-                return response()->json(['status' => 'Token is Expired']);
-            }else{
-                return response()->json(['status' => 'Authorization Token not found']);
+            if ($request->is('api/*')) {
+                // Untuk API, return JSON response
+                if ($e instanceof TokenInvalidException){
+                    return response()->json(['status' => 'Token is Invalid'], 401);
+                }else if ($e instanceof TokenExpiredException){
+                    return response()->json(['status' => 'Token is Expired'], 401);
+                }else{
+                    return response()->json(['status' => 'Authorization Token not found'], 401);
+                }
+            } else {
+                // Untuk Web, redirect ke login
+                return redirect()->route('admin.login');
             }
         }
         return $next($request);

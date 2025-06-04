@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Terms extends Model
 {
     protected $guarded = [];
-
+    protected $fillable = ['name', 'message'];
 }
