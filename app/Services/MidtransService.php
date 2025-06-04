@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Snap;
+use PHPUnit\Exception;
 
 class MidtransService
 {
@@ -15,12 +17,12 @@ class MidtransService
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function createToken(array $data)
+    public function createToken($data)
     {
         $params = [
             'transaction_details' => [
-                'order_id' => $data['transaction.id'],
-                'gross_amount' => $data['transaction.total_price'],
+                'order_id' => $data->id,
+                'gross_amount' => $data->total_price,
             ],
             'customer_details' => [
                 'fisrt_name' => auth()->user()->username,
@@ -28,14 +30,14 @@ class MidtransService
             ],
             'item_details' => [
                 [
-                    'id' => $data['product.id'],
-                    'name' => $data['product.name'],
-                    'quantity' => $data['transaction.rent_day'],
-                    'price' => $data['product.price']
+                    'id' => $data->product->id,
+                    'name' => $data->product->name,
+                    'quantity' => $data->rent_day,
+                    'price' => $data->product->price
 
                 ]
             ]
         ];
-        Snap::getSnapToken($params);
+            return Snap::getSnapToken($params);
     }
 }

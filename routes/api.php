@@ -13,6 +13,7 @@ Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
 
+Route::post('/midtrans/callback', [MidtransController::class,'callback']);
 Route::middleware('jwt.verify')->group( function () {
 
     Route::middleware('role:admin')->group(function () {

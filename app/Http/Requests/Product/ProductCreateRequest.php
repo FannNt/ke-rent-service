@@ -35,7 +35,7 @@ class ProductCreateRequest extends FormRequest
             'address_text' => 'required|string|min:10|max:200',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
-            'note' => 'nullable|string|max:300',
+            'additional_note' => 'nullable|string|max:300',
             'user_id' => 'exists:users,id'
         ];
     }
