@@ -9,14 +9,17 @@ use App\Classes\ApiResponse;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Repositories\User\UserRepository;
 
 class AdminPanelController extends Controller
 {
     protected $UserController;
+    protected $userRepository;
 
-    public function __construct(UserController $UserController)
+    public function __construct(UserController $UserController, UserRepository $userRepository)
     {
         $this->UserController = $UserController;
+        $this->userRepository = $userRepository;
     }
 
     public function index()
@@ -27,6 +30,38 @@ class AdminPanelController extends Controller
     public function showHome()
     {
         return view('adminPage');
+    }
+
+    public function getUsers()
+    {
+        $response = $this->UserController->show();
+        return $response;
+    }
+
+    public function searchUsers(Request $request)
+    {
+        try {
+            $search = $request->get('search');
+            $users = $this->userRepository->all();
+            
+            if ($search) {
+                $users = $users->filter(function($user) use ($search) {
+                    return str_contains(strtolower($user->username), strtolower($search)) ||
+                           str_contains(strtolower($user->email), strtolower($search)) ||
+                           str_contains($user->id, $search);
+                });
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $users->values()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
     
     public function login(Request $request)
@@ -84,6 +119,28 @@ class AdminPanelController extends Controller
                 'title' => 'Oops...',
                 'text' => 'Terjadi kesalahan: ' . $e->getMessage()
             ])->header('Content-Type', 'application/json');
+        }
+    }
+
+    public function banUser($id)
+    {
+        try {
+            $result = $this->userRepository->bannedUser($id);
+            if ($result) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User berhasil dibanned'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membanned user'
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
