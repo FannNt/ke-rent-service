@@ -10,16 +10,19 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\User\UserLoginRequest;
 use App\Http\Repositories\User\UserRepository;
+use App\Http\Repositories\Terms\TermsRepository;
 
 class AdminPanelController extends Controller
 {
     protected $UserController;
     protected $userRepository;
+    protected $TermsRepository;
 
-    public function __construct(UserController $UserController, UserRepository $userRepository)
+    public function __construct(UserController $UserController, UserRepository $userRepository, TermsRepository $TermsRepository)
     {
         $this->UserController = $UserController;
         $this->userRepository = $userRepository;
+        $this->TermsRepository = $TermsRepository;
     }
 
     public function index()
@@ -140,6 +143,80 @@ class AdminPanelController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getTerms()
+    {
+        try {
+            $terms = $this->TermsRepository->showTerms();
+            return response()->json([
+                'success' => true,
+                'data' => $terms
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data aturan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function addTerms(Request $request)
+    {
+        try {
+            $data = $this->TermsRepository->addTerms([
+                'name' => $request->name,
+                'message' => $request->message
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Aturan berhasil ditambahkan',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan aturan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function editTerms($id, Request $request)
+    {
+        try {
+            $data = $this->TermsRepository->editTerns($id, [
+                'name' => $request->name,
+                'message' => $request->message
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Aturan berhasil diperbarui',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui aturan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function removeTerms($id)
+    {
+        try {
+            $this->TermsRepository->removeTerms($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Aturan berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus aturan: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -16,21 +16,28 @@
 
     <!-- Section: Aturan Aplikasi -->
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <strong>Aturan Aplikasi</strong>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRuleModal">
+                <i class="fas fa-plus"></i> Tambah Aturan
+            </button>
         </div>
         <div class="card-body">
-            <form id="aturanForm">
-                <div class="mb-3">
-                    <label for="aturan1" class="form-label">Aturan 1</label>
-                    <input type="text" class="form-control" id="aturan1" name="aturan1" value="Contoh aturan 1">
-                </div>
-                <div class="mb-3">
-                    <label for="aturan2" class="form-label">Aturan 2</label>
-                    <input type="text" class="form-control" id="aturan2" name="aturan2" value="Contoh aturan 2">
-                </div>
-                <button type="submit" class="btn btn-success w-100 w-md-auto">Simpan Perubahan</button>
-            </form>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px">No</th>
+                            <th style="width: 200px">Nama</th>
+                            <th>Aturan</th>
+                            <th style="width: 150px">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -204,6 +211,63 @@
   </div>
 </div>
 
+<!-- Modal Tambah Aturan -->
+<div class="modal fade" id="addRuleModal" tabindex="-1" aria-labelledby="addRuleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRuleModalLabel">Tambah Aturan Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addRuleForm">
+                    <div class="mb-3">
+                        <label for="ruleName" class="form-label">Nama Aturan</label>
+                        <input type="text" class="form-control" id="ruleName" name="ruleName" required placeholder="Contoh: Aturan Umur">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ruleContent" class="form-label">Isi Aturan</label>
+                        <textarea class="form-control" id="ruleContent" name="ruleContent" rows="3" required placeholder="Masukkan isi aturan baru..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="addRule()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Aturan -->
+<div class="modal fade" id="editRuleModal" tabindex="-1" aria-labelledby="editRuleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRuleModalLabel">Edit Aturan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRuleForm">
+                    <input type="hidden" id="editRuleId">
+                    <div class="mb-3">
+                        <label for="editRuleName" class="form-label">Nama Aturan</label>
+                        <input type="text" class="form-control" id="editRuleName" name="editRuleName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRuleContent" class="form-label">Isi Aturan</label>
+                        <textarea class="form-control" id="editRuleContent" name="editRuleContent" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="updateRule()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- SweetAlert2 JS -->
@@ -367,15 +431,210 @@
         });
     }
 
-    document.getElementById('aturanForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Lakukan request ke backend untuk update aturan aplikasi
+    // Fungsi untuk mengambil data aturan
+    async function fetchRules() {
+        try {
+            const response = await fetch('{{ route("terms") }}');
+            const result = await response.json();
+            
+            if (result.success) {
+                const rulesTableBody = document.querySelector('table tbody');
+                rulesTableBody.innerHTML = '';
+                
+                result.data.forEach((rule, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${rule.name}</td>
+                        <td>${rule.message}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editRuleModal" onclick="showEditRuleModal(${rule.id}, '${rule.name}', '${rule.message}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeleteRule(${rule.id})">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </td>
+                    `;
+                    rulesTableBody.appendChild(row);
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Gagal mengambil data aturan'
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching rules:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat mengambil data aturan'
+            });
+        }
+    }
+
+    // Fungsi untuk menampilkan modal edit aturan
+    function showEditRuleModal(id, name, content) {
+        document.getElementById('editRuleId').value = id;
+        document.getElementById('editRuleName').value = name;
+        document.getElementById('editRuleContent').value = content;
+    }
+
+    // Panggil fetchRules saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', fetchRules);
+
+    // Fungsi untuk menambah aturan baru
+    async function addRule() {
+        const name = document.getElementById('ruleName').value;
+        const message = document.getElementById('ruleContent').value;
+
+        try {
+            const response = await fetch('{{ route("terms.add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    message: message
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Aturan berhasil ditambahkan'
+                });
+                // Tutup modal dan refresh data
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addRuleModal'));
+                modal.hide();
+                document.getElementById('addRuleForm').reset();
+                fetchRules();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: result.message || 'Gagal menambahkan aturan'
+                });
+            }
+        } catch (error) {
+            console.error('Error adding rule:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat menambahkan aturan'
+            });
+        }
+    }
+
+    // Fungsi untuk mengupdate aturan
+    async function updateRule() {
+        const id = document.getElementById('editRuleId').value;
+        const name = document.getElementById('editRuleName').value;
+        const message = document.getElementById('editRuleContent').value;
+
+        try {
+            const response = await fetch(`{{ url('terms') }}/${id}/edit`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    message: message
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Aturan berhasil diperbarui'
+                });
+                // Tutup modal dan refresh data
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editRuleModal'));
+                modal.hide();
+                fetchRules();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: result.message || 'Gagal memperbarui aturan'
+                });
+            }
+        } catch (error) {
+            console.error('Error updating rule:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat memperbarui aturan'
+            });
+        }
+    }
+
+    // Fungsi untuk menghapus aturan
+    async function deleteRule(id) {
+        try {
+            const response = await fetch(`{{ url('terms') }}/${id}/remove`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Aturan berhasil dihapus'
+                });
+                fetchRules();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: result.message || 'Gagal menghapus aturan'
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting rule:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat menghapus aturan'
+            });
+        }
+    }
+
+    // Update fungsi confirmDeleteRule untuk memanggil deleteRule
+    function confirmDeleteRule(id) {
         Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Aturan aplikasi berhasil diubah'
+            title: 'Konfirmasi Hapus',
+            text: "Apakah Anda yakin ingin menghapus aturan ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteRule(id);
+            }
         });
-    });
+    }
 </script>
 </body>
 </html>
