@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('transaction', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
+            $table->foreignId('product_id');
             $table->integer('total_price');
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
+            $table->integer('rent_day')->default(1);
+            $table->date('rental_start');
+            $table->date('rental_end');
             $table->timestamps();
         });
     }

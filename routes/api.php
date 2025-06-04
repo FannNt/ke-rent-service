@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -42,9 +43,9 @@ Route::middleware('jwt.verify')->group( function () {
     // transaction
     Route::post('/transactions', [TransactionController::class, 'create']);
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
-    Route::put('/transactions/{id}', [TransactionController::class, 'update']);
-    Route::delete('/transactions/{id}', [TransactionController::class, 'delete']);
-    Route::get('/user/{userId}/transactions', [TransactionController::class, 'getByUserId']);
+    Route::post('/transaction/approve/{id}', [TransactionController::class, 'acceptTransaction']);
+    Route::post('/transaction/reject/{id}', [TransactionController::class, 'rejectTransaction']);
+    Route::get('/user/{userId}/transactions', [TransactionController::class, 'transactionHistory']);
 
     // payment
     Route::post('/payment', [PaymentController::class, 'create']);
@@ -57,4 +58,8 @@ Route::middleware('jwt.verify')->group( function () {
     Route::post('/chat/{chat}/messages', [ChatController::class,'sendMessage']);
     Route::get('/chat/{chat}/messages', [ChatController::class, 'getMessages']);
 
+    //notification
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notification/{id}/read',[NotificationController::class,'readNotification']);
+    Route::get('/notification/count',[NotificationController::class, 'count']);
 });

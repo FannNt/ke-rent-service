@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Support\Facades\DB;  
+use App\Models\ProductImage;
 use Illuminate\Database\Seeder;
-use App\Models\product;
+use App\Models\Product;
 
 class ProductSeeder extends Seeder
 {
@@ -14,14 +13,10 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('products')->insert([
-            [
-                "name" => "laptop",
-                "price" => 1000,
-                "description" => "laptopasdasd",
-                "user_id" => 1,
-                "image_publicId" => "asdasdasd"
-            ],
-        ]);
+        Product::factory(10)->create()->each(function ($product) {
+            ProductImage::factory()->create([
+                'product_id' => $product->id
+            ]);
+        });
     }
 }

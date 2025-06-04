@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponse;
 use App\Http\Requests\Product\ProductCreateRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\User;
 use App\Services\ProductService;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -23,20 +25,21 @@ class ProductController extends Controller
     public function index()
     {
         $product = $this->productService->index();
-        return ApiResponse::sendResponse($product,'');
+
+        return ApiResponse::sendResponse(ProductResource::collection($product),'');
     }
 
     public function create(ProductCreateRequest $request): JsonResponse
     {
         $product = $this->productService->create($request->validated());
-        return ApiResponse::sendResponse($product,'Success Create Product', 201);
+        return ApiResponse::sendResponse(new ProductResource($product),'Success Create Product', 201);
     }
 
     public function update($id, ProductUpdateRequest $request): JsonResponse
     {
         try {
             $product = $this->productService->update($id, $request->validated());
-            return ApiResponse::sendResponse($product, 'Product updated successfully');
+            return ApiResponse::sendResponse(new ProductResource($product), 'Product updated successfully');
         } catch (UnauthorizedException $e) {
             return ApiResponse::sendErrorResponse($e->getMessage(), 403);
         } catch (\Exception $e) {
@@ -44,7 +47,7 @@ class ProductController extends Controller
                 'id' => $id,
                 'error' => $e->getMessage()
             ]);
-            return ApiResponse::sendErrorResponse('Failed to update product', 500);
+            return ApiResponse::sendErrorResponse('Failed to update product');
         }
     }
 
@@ -60,19 +63,19 @@ class ProductController extends Controller
     public function findById($id)
     {
         $product = $this->productService->findById($id);
-        return ApiResponse::sendResponse($product,'');
+        return ApiResponse::sendResponse(new ProductResource($product),'');
     }
 
     public function findUserProduct()
     {
         $data = $this->productService->findUserProduct();
-        return ApiResponse::sendResponse($data,'');
+        return ApiResponse::sendResponse(ProductResource::collection($data),'');
     }
 
     public function findProductByUserId($userId)
     {
         $data = $this->productService->getByUserId($userId);
-        return ApiResponse::sendResponse($data,"Success get product from $userId");
+        return ApiResponse::sendResponse(ProductResource::collection($data),"Success get product from $userId");
     }
 
 }

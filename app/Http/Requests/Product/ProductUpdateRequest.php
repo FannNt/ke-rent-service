@@ -26,14 +26,17 @@ class ProductUpdateRequest extends FormRequest
             $this->all()
         ]);
         return [
-            'name' => 'sometimes|string|min:3|max:50',
-            'price' => 'sometimes|integer|',
-            'category' => 'sometimes|string',
-            'description' => 'sometimes|string|max:200',
-            'image' => 'sometimes|image',
-            'product_condition' => 'string',
-            'note' => 'string',
-            'location' => 'string'
+            'name' => 'sometimes|string|min:3|max:100',
+            'description' => 'sometimes|string|min:10|max:500',
+            'price' => 'sometimes|integer|min:10000',
+            'category' => 'sometimes|string|in:Kamera,Elektronik,Outdoor,Kendaraan,Furnitur,Lainnya',
+            'year' => 'sometimes|string|max:4',
+            'images' => 'sometimes|array|min:1|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'address_text' => 'sometimes|string|min:10|max:200',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
+            'additional_note' => 'sometimes|string|max:300',
         ];
     }
 }

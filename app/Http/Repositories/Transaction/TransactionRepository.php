@@ -4,40 +4,41 @@ namespace App\Http\Repositories\Transaction;
 
 use App\Models\Transaction;
 use App\Models\Payment;
+use App\TransactionStatus;
 use Illuminate\Support\Facades\DB;
 use App\Interface\Transaction\TransactionRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
-    protected $model;
 
-    public function __construct(Transaction $model)
-    {
-        $this->model = $model;
-    }
 
     public function all()
     {
-        return $this->model->all();
+        return Transaction::with(['product','payment']);
     }
 
-    public function create(array $data)
+    public function create(array $data,$userId)
     {
         DB::beginTransaction();
+        Log::info('data',[$data]);
 
         try{
             $transaction = Transaction::create([
-                "user_id" => $data['user_id'],
+                "product_id" => $data['product_id'],
+                "user_id" => $userId,
                 "total_price" => $data['total_price'],
-                "status" => $data['status'],
-                "created_at" => $data['created_at']
+                'rent_day' =>$data['rent_day'],
+                "rental_start" => $data['rental_start'],
+                "rental_end" => $data['rental_end']
             ]);
+            $transaction->refresh();
 
             $payment = Payment::create([
                 "transaction_id" => $transaction->id,
                 "methods" => $data['payment']['methods'] ?? 'COD',
-                "status" => $data['payment']['status'] ?? 'not paid'
             ]);
+            $payment->refresh();
 
             DB::commit();
             return [
@@ -51,28 +52,31 @@ class TransactionRepository implements TransactionRepositoryInterface
         }
     }
 
-    public function update($id, array $data)
+    public function updateStatus($id,TransactionStatus $status)
     {
-        $transaction = $this->model->findOrFail($id);
-        $transaction->update($data);
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update([
+            'status' => $status
+        ]);
         return $transaction;
     }
 
+
     public function findById($id)
     {
-        return Transaction::with('payment')->findOrFail($id);
+        return Transaction::with('payment','product.user','product.image')->findOrFail($id);
     }
 
     public function delete($id)
     {
-        $transaction = $this->model->findOrFail($id);
+        $transaction = Transaction::findOrFail($id);
         $transaction->delete();
         return true;
     }
 
     public function getByUserId($userId)
     {
-        return Transaction::with('payment')
+        return Transaction::with('payment','product.user','product.image')
             ->where('user_id', $userId)
             ->get();
     }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TransactionHistoryResource;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use App\Classes\ApiResponse;
 use App\Http\Requests\Transaction\TransactionCreateRequest;
@@ -32,21 +34,27 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         $result = $this->transactionService->create($data);
-        $data = $result['data'];
-        $snapToken = $result['snap_token'];
 
-        $response = [
-            "data" => $data,
-            "snap_token" => $snapToken
-        ];
-
-        return ApiResponse::sendResponse($response,"transaction created successfully", 201);
+        return ApiResponse::sendResponse($result,"transaction created successfully", 201);
     }
+
+    public function acceptTransaction($id)
+    {
+        $data = $this->transactionService->acceptTransaction($id);
+        return ApiResponse::sendResponse($data,'success approve transaction');
+    }
+    public function rejectTransaction($id)
+    {
+        $data = $this->transactionService->rejectTransaction($id);
+        return ApiResponse::sendResponse($data,'success reject transaction');
+    }
+
+
 
     public function findById($id): JsonResponse
     {
         $transaction = $this->transactionService->findById($id);
-        return ApiResponse::sendResponse($transaction,'');
+        return ApiResponse::sendResponse(new TransactionResource($transaction),'');
     }
 
     public function update(TransactionUpdateRequest $request,$id): JsonResponse
@@ -61,16 +69,10 @@ class TransactionController extends Controller
         return ApiResponse::sendResponse('','transaction deleted successfully');
     }
 
-    public function getByUserId($userId)
+    public function transactionHistory($userId)
     {
         $transactions = $this->transactionService->getByUserId($userId);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'user_id' => $userId,
-                'transactions' => $transactions
-            ]
-        ]);
+        return ApiResponse::sendResponse(TransactionHistoryResource::collection($transactions),'');
     }
 }
