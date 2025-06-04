@@ -61,13 +61,10 @@ class TransactionService
         $payment = $result['payment'];
         $transaction->user->notify(new BuyerWaitingNotification($transaction));
         $transaction->product->user->notify(new SellerBuyedNotification($transaction));
-        $response = [
+        return [
             "transaction" => $transaction->only('id','user_id','total_price','status','product_id'),
             "payment" => $payment->only('id','transaction_id','methods')
         ];
-
-        Log::info($transaction);
-        return $response;
     }
 
     public function acceptTransaction($id)

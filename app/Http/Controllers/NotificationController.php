@@ -32,4 +32,24 @@ class NotificationController extends Controller
 
         return ApiResponse::sendResponse(NotificationResource::collection($notifications),'success get all user notification');
     }
+
+    public function readNotification($id)
+    {
+        $notification = auth()->user()->unreadNotifications()->find($id);
+        if (!$notification) {
+            return ApiResponse::sendErrorResponse('failed to mark as read');
+        }
+        $notification->markAsRead();
+
+        return ApiResponse::sendResponse('','Success read notification');
+    }
+
+    public function count()
+    {
+        $notification = auth()->user()->unreadNotifications();
+        $unread = $notification->count();
+
+        return ApiResponse::sendResponse($unread,'Success count unread notification');
+    }
+
 }

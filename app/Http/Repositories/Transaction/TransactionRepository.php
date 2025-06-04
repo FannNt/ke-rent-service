@@ -64,7 +64,7 @@ class TransactionRepository implements TransactionRepositoryInterface
 
     public function findById($id)
     {
-        return Transaction::with('payment')->findOrFail($id);
+        return Transaction::with('payment','product.user','product.image')->findOrFail($id);
     }
 
     public function delete($id)
@@ -76,7 +76,7 @@ class TransactionRepository implements TransactionRepositoryInterface
 
     public function getByUserId($userId)
     {
-        return Transaction::with('payment')
+        return Transaction::with('payment','product.user','product.image')
             ->where('user_id', $userId)
             ->get();
     }

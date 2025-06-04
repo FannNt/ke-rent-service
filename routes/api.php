@@ -45,8 +45,7 @@ Route::middleware('jwt.auth')->group( function () {
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
     Route::post('/transaction/approve/{id}', [TransactionController::class, 'acceptTransaction']);
     Route::post('/transaction/reject/{id}', [TransactionController::class, 'rejectTransaction']);
-    Route::delete('/transactions/{id}', [TransactionController::class, 'delete']);
-    Route::get('/user/{userId}/transactions', [TransactionController::class, 'getByUserId']);
+    Route::get('/user/{userId}/transactions', [TransactionController::class, 'transactionHistory']);
 
     // payment
     Route::post('/payment', [PaymentController::class, 'create']);
@@ -61,4 +60,6 @@ Route::middleware('jwt.auth')->group( function () {
 
     //notification
     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notification/{id}/read',[NotificationController::class,'readNotification']);
+    Route::get('/notification/count',[NotificationController::class, 'count']);
 });

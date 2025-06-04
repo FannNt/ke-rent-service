@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TransactionHistoryResource;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use App\Classes\ApiResponse;
 use App\Http\Requests\Transaction\TransactionCreateRequest;
@@ -52,7 +54,7 @@ class TransactionController extends Controller
     public function findById($id): JsonResponse
     {
         $transaction = $this->transactionService->findById($id);
-        return ApiResponse::sendResponse($transaction,'');
+        return ApiResponse::sendResponse(new TransactionResource($transaction),'');
     }
 
     public function update(TransactionUpdateRequest $request,$id): JsonResponse
@@ -67,16 +69,10 @@ class TransactionController extends Controller
         return ApiResponse::sendResponse('','transaction deleted successfully');
     }
 
-    public function getByUserId($userId)
+    public function transactionHistory($userId)
     {
         $transactions = $this->transactionService->getByUserId($userId);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'user_id' => $userId,
-                'transactions' => $transactions
-            ]
-        ]);
+        return ApiResponse::sendResponse(TransactionHistoryResource::collection($transactions),'');
     }
 }
