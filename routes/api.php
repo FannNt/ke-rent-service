@@ -50,9 +50,9 @@ Route::middleware('jwt.verify')->group( function () {
     Route::get('/user/{userId}/transactions', [TransactionController::class, 'transactionHistory']);
 
     // payment
-    Route::post('/payment', [PaymentController::class, 'create']);
-    Route::put('/payment/{id}', [PaymentController::class, 'update']);
-    Route::get('/payment/{id}', [PaymentController::class, 'findById']);
+    Route::post('/payment/{id}', [PaymentController::class, 'pay']);
+//    Route::put('/payment/{id}', [PaymentController::class, 'update']);
+//    Route::get('/payment/{id}', [PaymentController::class, 'findById']);
 
     //chat
     Route::post('/chat', [ChatController::class, 'create']);

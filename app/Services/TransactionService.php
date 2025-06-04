@@ -48,6 +48,11 @@ class TransactionService
     {
 
         $product = $this->productRepository->findById($data['product_id']);
+        if ($product->user_id == auth()->id()) {
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Cant buy your own product',403)
+            );
+        }
         $start = Carbon::parse($data['rental_start']);
         $end = Carbon::parse($data['rental_end']);
         $rentDay =  $start->diffInDays($end);
@@ -70,13 +75,13 @@ class TransactionService
     public function acceptTransaction($id)
     {
         $transaction = $this->transactionRepository->findById($id);
-        if ($transaction->product->user != auth()->id()){
+        if ($transaction->product->user->id != auth()->id()){
             throw new HttpResponseException(
                 ApiResponse::sendErrorResponse('Forbidden',403)
             );
         }
         $transaction->user->notify(new BuyerApproveNotification($transaction));
-        auth()->notify(new SellerWaitingNotification($transaction));
+        auth()->user()->notify(new SellerWaitingNotification($transaction));
 
         return $this->transactionRepository->updateStatus($id, TransactionStatus::APPROVED);
     }
@@ -84,7 +89,7 @@ class TransactionService
     public function rejectTransaction($id)
     {
         $transaction = $this->transactionRepository->findById($id);
-        if ($transaction->product->user != auth()->id()){
+        if ($transaction->product->user->id != auth()->id()){
             throw new HttpResponseException(
                 ApiResponse::sendErrorResponse('Forbidden',403)
             );

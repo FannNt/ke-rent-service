@@ -21,7 +21,7 @@ class MidtransService
     {
         $params = [
             'transaction_details' => [
-                'order_id' => $data->id,
+                'order_id' => $data->order_id,
                 'gross_amount' => $data->total_price,
             ],
             'customer_details' => [

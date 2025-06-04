@@ -34,11 +34,15 @@ class TransactionRepository implements TransactionRepositoryInterface
             ]);
             $transaction->refresh();
 
+
+
             $payment = Payment::create([
+                "order_id" => uniqid().$transaction->id,
                 "transaction_id" => $transaction->id,
-                "methods" => $data['payment']['methods'] ?? 'COD',
-            ]);
-            $payment->refresh();
+                "methods" => $data['payment']['methods'] ?? 'Transfer'
+                ]);
+                $payment->refresh();
+
 
             DB::commit();
             return [

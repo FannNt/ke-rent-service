@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Request\Payment\PaymentCreateRequest;
+use App\Http\Request\Payment\PaymentUpdateRequest;
 use Illuminate\Http\Request;
-use App\Http\Requests\Payment\PaymentCreateRequest;
-use App\Http\Requests\Payment\PaymentUpdateRequest;
 use App\Services\PaymentServices;
 use Illuminate\Http\JsonResponse;
 
@@ -18,10 +19,14 @@ class PaymentController extends Controller
         $this->paymentService = $paymentService;
     }
 
-    public function create(PaymentCreateRequest $request): JsonResponse
+    public function pay($transactionId): JsonResponse
     {
-        $payment = $this->paymentService->create($request->validated());
-        return response()->json($payment, 201);
+        $result = $this->paymentService->pay($transactionId);
+
+        return ApiResponse::sendResponse([
+            'token' => $result['token'],
+            'order_id' => $result['order_id']
+            ],'');
     }
 
     public function update(PaymentUpdateRequest $request, $id): JsonResponse

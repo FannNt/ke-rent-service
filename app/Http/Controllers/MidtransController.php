@@ -11,7 +11,6 @@ class MidtransController extends Controller
 {
     public function callback(Request $request)
     {
-        Log::info($request);
         $serverKey = config('midtrans.server_key');
         $signatureKey = hash('sha512',
             $request->order_id .
@@ -25,34 +24,37 @@ class MidtransController extends Controller
         }
 
         // Get transaction by order_id
-        $transaction = Payment::where('transaction_id', $request->order_id)->first();
+        $payment = Payment::where('order_id', $request->order_id)->first();
 
-        if (!$transaction) {
+        if (!$payment) {
             return response()->json(['message' => 'Transaction not found'], 404);
         }
+
+        $payment->methods = $request->payment_type;
 
         // Update status based on Midtrans notification
         switch ($request->transaction_status) {
             case 'capture':
             case 'settlement':
-                $transaction->status = 'paid';
+                $payment->status = 'paid';
+
                 break;
 
             case 'expire':
-                $transaction->status = 'expired';
+                $payment->status = 'expired';
                 break;
 
             case 'cancel':
             case 'deny':
-                $transaction->status = 'failed';
+                $payment->status = 'failed';
                 break;
 
             case 'pending':
-                $transaction->status = 'waiting_payment';
+                $payment->status = 'waiting_payment';
                 break;
         }
 
-        $transaction->save();
+        $payment->save();
 
         return response()->json(['message' => 'Notification handled'], 200);
     }

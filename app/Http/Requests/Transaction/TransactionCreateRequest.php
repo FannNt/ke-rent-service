@@ -22,7 +22,7 @@ class TransactionCreateRequest extends FormRequest
             'rental_end' => 'required|date',
             'pickup_hour' => 'required|integer|min:0|max:23',
             'return_hour' => 'required|integer|min:0|max:23',
-            'payment.methods' => 'required|in:COD,Transfer,Other',
+            'payment.methods' => 'nullable|in:COD,Transfer,Other',
         ];
     }
     protected function failedValidation(Validator $validator)
