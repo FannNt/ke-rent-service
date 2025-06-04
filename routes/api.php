@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
@@ -12,8 +13,8 @@ use App\Http\Controllers\PaymentController;
 Route::post('/user/create', [UserController::class,'create']);
 Route::post('/user/login', [UserController::class,'login']);
 Route::post('/user/phoneLogin',[UserController::class,'loginWithNumber']);
-
 Route::post('/midtrans/callback', [MidtransController::class,'callback']);
+
 Route::middleware('jwt.verify')->group( function () {
 
     Route::middleware('role:admin')->group(function () {

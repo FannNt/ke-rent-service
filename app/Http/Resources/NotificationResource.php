@@ -25,7 +25,8 @@ class NotificationResource extends JsonResource
                 'product' =>  [
                     'id' => $this->transaction->product->id,
                     'name' => $this->transaction->product->name,
-                    'image' => $this->transaction->product->image->pluck('url'),
+                    'price' => $this->transaction->product->price,
+                    'image' => $this->transaction->product->image->pluck('image'),
                     'user' => new UserResource($this->transaction->product->user)
                 ],
             ]
