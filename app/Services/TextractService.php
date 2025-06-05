@@ -229,7 +229,7 @@ class TextractService
             ];
 
             // Validate required fields
-            $requiredFields = [];
+            $requiredFields = ['nik'];
             $missingFields = [];
             foreach ($requiredFields as $field) {
                 if (empty($formattedData[$field])) {
