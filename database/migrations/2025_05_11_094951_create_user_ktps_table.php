@@ -14,17 +14,17 @@ return new class extends Migration
         Schema::create('user_ktps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique();
-            $table->bigInteger('nik')->unique();
-            $table->string('nama');
-            $table->string('ttl');
-            $table->string('alamat');
+            $table->bigInteger('nik')->unique()->nullable();
+            $table->string('nama')->nullable();
+            $table->string('ttl')->nullable();
+            $table->string('alamat')->nullable();
             $table->string('rt_rw')->nullable();
-            $table->string('kel_desa');
-            $table->string('kecamatan');
-            $table->string('agama');
-            $table->string('pekerjaan');
-            $table->string('warga_negara');
-            $table->string('ktp_url');
+            $table->string('kel_desa')->nullable();
+            $table->string('kecamatan')->nullable();
+            $table->string('agama')->nullable();
+            $table->string('pekerjaan')->nullable();
+            $table->string('warga_negara')->nullable();
+            $table->string('ktp_url')->nullable();
             $table->timestamps();
         });
     }
