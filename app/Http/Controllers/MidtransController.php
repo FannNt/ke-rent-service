@@ -24,7 +24,7 @@ class MidtransController extends Controller
         }
 
         // Get transaction by order_id
-        $payment = Payment::where('order_id', $request->order_id)->first();
+        $payment = Payment::with('transaction')->where('order_id', $request->order_id)->first();
 
         if (!$payment) {
             return response()->json(['message' => 'Transaction not found'], 404);
@@ -37,7 +37,7 @@ class MidtransController extends Controller
             case 'capture':
             case 'settlement':
                 $payment->status = 'paid';
-
+                $payment->transaction->status = 'completed';
                 break;
 
             case 'expire':

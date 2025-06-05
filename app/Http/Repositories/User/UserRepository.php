@@ -60,7 +60,7 @@ class UserRepository implements UserRepositoryInterface {
         if (!$user){
             return null;
         }
-        
+
         // Update status banned di tabel users_statuses
         UsersStatus::where('id', $user->user_status_id)->update([
             'is_banned' => true,
@@ -71,7 +71,6 @@ class UserRepository implements UserRepositoryInterface {
 
     public function createKtp($data, $imageKtp)
     {
-        Log::info('Creating KTP record with data:', $data);
 
         try {
             $user = auth()->user();

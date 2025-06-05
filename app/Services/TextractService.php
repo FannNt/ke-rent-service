@@ -225,11 +225,11 @@ class TextractService
                 'agama' => $ktpData['agama'],
                 'pekerjaan' => $ktpData['pekerjaan'],
                 'warga_negara' => $ktpData['kewarganegaraan'],
-                'ktp_url' => $s3Url, 
+                'ktp_url' => $s3Url,
             ];
 
             // Validate required fields
-            $requiredFields = ['nik', 'nama', 'ttl', 'alamat', 'kel_desa', 'kecamatan', 'agama', 'pekerjaan', 'warga_negara'];
+            $requiredFields = [];
             $missingFields = [];
             foreach ($requiredFields as $field) {
                 if (empty($formattedData[$field])) {
@@ -300,14 +300,14 @@ class TextractService
                 ]);
                 return true;
             }
-            
+
             Log::warning('KTP image not found for deletion', [
                 'bucket' => $bucket,
                 'key' => $key,
                 'original_url' => $s3Url
             ]);
             return false;
-            
+
         } catch (Exception $e) {
             Log::error('Failed to delete KTP image:', [
                 'error' => $e->getMessage(),
