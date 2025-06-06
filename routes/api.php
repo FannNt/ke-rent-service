@@ -47,7 +47,9 @@ Route::middleware('jwt.verify')->group( function () {
     Route::get('/transactions/{id}', [TransactionController::class, 'findById']);
     Route::post('/transaction/approve/{id}', [TransactionController::class, 'acceptTransaction']);
     Route::post('/transaction/reject/{id}', [TransactionController::class, 'rejectTransaction']);
-    Route::get('/user/{userId}/transactions', [TransactionController::class, 'transactionHistory']);
+    Route::get('/user/transactions', [TransactionController::class, 'transactionHistory']);
+    Route::post('/transaction/{id}', [TransactionController::class,'addBill']);
+    Route::post('/transaction/{id}/rating', [TransactionController::class,'rating']);
 
     // payment
     Route::post('/payment/{id}', [PaymentController::class, 'pay']);

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Classes\ApiResponse;
 use App\Interface\Product\ProductRepositoryInterface;
 use App\Interface\Transaction\TransactionRepositoryInterface;
+use App\Interface\User\UserRepositoryInterface;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\BuyerApproveNotification;
@@ -31,12 +32,13 @@ class TransactionService
     protected $transactionRepository;
     protected $paymentServices;
     protected $productRepository;
-
-    public function __construct(TransactionRepository $transactionRepo, PaymentServices $paymentServices, ProductRepositoryInterface $productRepository)
+    protected $userRepository;
+    public function __construct(UserRepositoryInterface $userRepository,TransactionRepository $transactionRepo, PaymentServices $paymentServices, ProductRepositoryInterface $productRepository)
     {
         $this->productRepository = $productRepository;
         $this->transactionRepository = $transactionRepo;
         $this->paymentServices = $paymentServices;
+        $this->userRepository = $userRepository;
     }
 
     public function index()
@@ -121,5 +123,42 @@ class TransactionService
     public function getByUserId($userId)
     {
         return $this->transactionRepository->getByUserId($userId);
+    }
+
+    public function addBill($transactionId)
+    {
+        $transaction = $this->transactionRepository->findById($transactionId);
+        if (!$transaction) {
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Not Found', 404)
+            );
+        }elseif($transaction->status != 'completed') {
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Cant do that action | forbidden',403)
+            );
+        }
+
+        $user = $transaction->product->user;
+        $this->userRepository->addBill($user->id,$transaction->total_price);
+
+        return true;
+    }
+
+    public function rating($id,$data)
+    {
+        $transaction = $this->transactionRepository->findById($id);
+
+        if($transaction->status != 'completed'){
+            throw new HttpResponseException(
+                ApiResponse::sendErrorResponse('Cant rating before completed',403)
+            );
+        }
+
+        return $this->productRepository->rating([
+            'product_id' => $transaction->product->id,
+            'rating' => $data['rating'],
+            'message' => $data['message']
+        ]);
+
     }
 }

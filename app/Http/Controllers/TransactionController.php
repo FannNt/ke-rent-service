@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Rating\AddRatingRequest;
 use App\Http\Resources\TransactionHistoryResource;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
@@ -49,7 +50,15 @@ class TransactionController extends Controller
         return ApiResponse::sendResponse($data,'success reject transaction');
     }
 
+    public function addBill($id)
+    {
 
+        if ($this->transactionService->addBill($id)) {
+            return ApiResponse::sendResponse(true,'Success add bill');
+        }else {
+            return ApiResponse::sendErrorResponse('Failed add bill');
+        }
+    }
 
     public function findById($id): JsonResponse
     {
@@ -69,10 +78,16 @@ class TransactionController extends Controller
         return ApiResponse::sendResponse('','transaction deleted successfully');
     }
 
-    public function transactionHistory($userId)
+    public function transactionHistory()
     {
-        $transactions = $this->transactionService->getByUserId($userId);
+        $transactions = $this->transactionService->getByUserId(auth()->id());
 
         return ApiResponse::sendResponse(TransactionHistoryResource::collection($transactions),'');
+    }
+
+    public function rating($id, AddRatingRequest $request)
+    {
+        $result = $this->transactionService->rating($id,$request->validated());
+        return ApiResponse::sendResponse($result,'Success giving rating');
     }
 }

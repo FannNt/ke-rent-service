@@ -5,6 +5,7 @@ namespace App\Http\Repositories\Product;
 use App\Interface\Product\ProductRepositoryInterface;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Rating;
 use App\Models\User;
 
 class ProductRepositories implements ProductRepositoryInterface {
@@ -46,6 +47,16 @@ class ProductRepositories implements ProductRepositoryInterface {
             'product_id' => $productId,
             'image' => $image['url'],
             'image_publicId' => $image['public_id']
+        ]);
+    }
+
+    public function rating(array $data)
+    {
+        Rating::create([
+            'user_id' => auth()->id(),
+            'product_id' => $data['product_id'],
+            'rating' => $data['rating'],
+            'message' => $data['message']
         ]);
     }
 }
